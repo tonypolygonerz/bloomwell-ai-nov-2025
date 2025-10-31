@@ -5,6 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import type { NextAuthOptions } from 'next-auth'
 import prisma from '@bloomwell/db'
 import { compare } from 'bcryptjs'
+import './types'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -13,11 +14,15 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
     }),
-    AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID ?? '',
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET ?? '',
-      tenantId: process.env.MICROSOFT_TENANT_ID,
-    }),
+    ...(process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET
+      ? [
+          AzureADProvider({
+            clientId: process.env.MICROSOFT_CLIENT_ID,
+            clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+            ...(process.env.MICROSOFT_TENANT_ID && { tenantId: process.env.MICROSOFT_TENANT_ID }),
+          }),
+        ]
+      : []),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -40,9 +45,9 @@ export const authOptions: NextAuthOptions = {
         }
         return {
           id: user.id,
-          email: user.email,
-          name: user.name ?? undefined,
-          image: user.image ?? undefined,
+          email: user.email ?? null,
+          name: user.name ?? null,
+          image: user.image ?? null,
         }
       },
     }),
@@ -57,7 +62,7 @@ export const authOptions: NextAuthOptions = {
           select: { role: true, trialStartedAt: true, trialEndsAt: true },
         })
         if (dbUser) {
-          token.role = dbUser.role
+          token.role = dbUser.role as string
           token.trialStartedAt = dbUser.trialStartedAt?.toISOString()
           token.trialEndsAt = dbUser.trialEndsAt?.toISOString()
         }
@@ -82,10 +87,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.name = session.user.name ?? ''
-        ;(session as never).userId = token.userId
-        ;(session as never).role = token.role
-        ;(session as never).trialStartedAt = token.trialStartedAt
-        ;(session as never).trialEndsAt = token.trialEndsAt
+        session.userId = token.userId
+        session.role = token.role
+        session.trialStartedAt = token.trialStartedAt
+        session.trialEndsAt = token.trialEndsAt
       }
       return session
     },
