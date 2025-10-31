@@ -1,0 +1,8 @@
+{
+  "name": "@bloomwell/webinars",
+  "version": "0.1.0",
+  "private": true,
+  "main": "jitsi-config.ts",
+  "types": "jitsi-config.ts"
+}
+

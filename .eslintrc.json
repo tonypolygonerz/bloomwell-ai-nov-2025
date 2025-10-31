@@ -1,0 +1,40 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": [
+    "**/postcss.config.*",
+    "packages/config/**/*",
+    "node_modules",
+    "dist",
+    "build"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.js", "**/*.cjs", "**/*.mjs"],
+      "env": { "node": true }
+    }
+  ],
+  "rules": {
+    "no-console": "error",
+    "no-debugger": "error",
+    "no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "variableLike", "format": ["camelCase"] },
+      { "selector": "typeLike", "format": ["PascalCase"] },
+      { "selector": "enumMember", "format": ["UPPER_CASE"] }
+    ],
+    "complexity": ["error", 10],
+    "max-lines-per-function": ["error", 50],
+    "max-depth": ["error", 4]
+  }
+}
+

@@ -1,0 +1,19 @@
+{
+  "name": "@bloomwell/auth",
+  "version": "0.1.0",
+  "private": true,
+  "main": "nextauth.ts",
+  "types": "nextauth.ts",
+  "dependencies": {
+    "next-auth": "^4.24.7",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "zod": "^3.23.8",
+    "@prisma/client": "^5.20.0",
+    "@bloomwell/db": "*",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6"
+  }
+}
+

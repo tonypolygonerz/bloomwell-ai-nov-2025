@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  emailVerified  DateTime?
+  hashedPassword String?
+  name           String?
+  image          String?
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+  role           Role     @default(USER)
+  organization   Organization?
+  chats          Chat[]
+  projects       Project[]
+  accounts       Account[]
+  sessions       Session[]
+  profileMetadata Json?
+}
+
+model Organization {
+  id             String  @id @default(cuid())
+  user           User    @relation(fields: [userId], references: [id])
+  userId         String  @unique
+  ein            String?
+  legalName      String?
+  mission        String?
+  budget         String?
+  staffSize      String?
+  focusAreas     String?
+  revenueBracket String?
+  serviceGeo     String?
+  fiscalYear     String?
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+  title     String
+  messages  Json[]
+  tokenUsed Int      @default(0)
+  sharedId  String?  @unique
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  name      String
+  files     File[]
+  chats     Chat[]
+  createdAt DateTime @default(now())
+  linkedGrantId       String?
+  applicationStatus   ProjectStatus? @default(DRAFT)
+  requestedAmount     Int?
+  applicationDeadline DateTime?
+  linkedGrant         Grant?          @relation(fields: [linkedGrantId], references: [id])
+}
+
+model File {
+  id         String   @id @default(cuid())
+  project    Project  @relation(fields: [projectId], references: [id])
+  projectId  String
+  name       String
+  mimeType   String
+  sizeBytes  Int
+  storageUrl String
+  parsedText String?
+  createdAt  DateTime @default(now())
+}
+
+model Webinar {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  slug          String   @unique
+  startsAt      DateTime
+  durationM     Int      @default(60)
+  hostName      String
+  hostTitle     String?
+  hostBio       String?
+  status        WebinarStatus @default(SCHEDULED)
+  jitsiRoomId   String   @unique
+  maxCapacity   Int      @default(5000)
+  materialsUrl  String?
+  rsvps         WebinarRSVP[]
+  registrations WebinarRegistration[]
+  createdAt     DateTime @default(now())
+}
+
+model WebinarRSVP {
+  id        String   @id @default(cuid())
+  webinar   Webinar  @relation(fields: [webinarId], references: [id])
+  webinarId String
+  name      String
+  email     String
+  org       String?
+  createdAt DateTime @default(now())
+}
+
+model WebinarRegistration {
+  id        String   @id @default(cuid())
+  webinar   Webinar  @relation(fields: [webinarId], references: [id])
+  webinarId String
+  email     String
+  name      String
+  approved  Boolean  @default(true)
+  joinedAt  DateTime?
+  joinToken String?  @unique
+}
+
+model Grant {
+  id          String   @id @default(cuid())
+  externalId  String   @unique
+  title       String
+  synopsis    String?
+  agency      String?
+  postedDate  DateTime?
+  closeDate   DateTime?
+  tags        String[]
+  eligibility String?
+  updatedAt   DateTime @updatedAt
+  linkedProjects Project[]
+}
+
+model WebSearchLog {
+  id        String   @id @default(cuid())
+  userId    String
+  query     String
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum WebinarStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  LIVE
+  COMPLETED
+  ENDED
+}
+
+enum ProjectStatus {
+  DRAFT
+  IN_PROGRESS
+  SUBMITTED
+  AWARDED
+  REJECTED
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+

@@ -1,0 +1,30 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@bloomwell/ui": [
+        "../../packages/ui"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

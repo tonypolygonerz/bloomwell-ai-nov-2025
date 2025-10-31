@@ -1,0 +1,38 @@
+{
+  "name": "bloomwell-ai-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@10.9.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "type-check": "turbo run type-check",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "test:coverage": "turbo run test:coverage",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:migrate": "turbo run db:migrate",
+    "db:reset": "turbo run db:reset",
+    "quality": "turbo run type-check lint format:check test",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "eslint": "^8.57.0",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3"
+  }
+}
+

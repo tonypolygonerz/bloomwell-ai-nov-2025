@@ -1,0 +1,11 @@
+{
+  "name": "@bloomwell/ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "chatService.ts",
+  "types": "chatService.ts",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}
+

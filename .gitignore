@@ -1,0 +1,14 @@
+node_modules
+.next
+.turbo
+dist
+build
+.DS_Store
+.env*
+coverage
+/.husky/_
+prisma/*.db
+
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
