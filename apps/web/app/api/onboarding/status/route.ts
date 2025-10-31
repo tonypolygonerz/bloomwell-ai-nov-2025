@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userId = (session as never).userId as string
+  const userId = session.userId ?? session.user.id
   if (!userId) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }

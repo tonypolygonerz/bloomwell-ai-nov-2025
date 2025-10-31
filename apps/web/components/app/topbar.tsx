@@ -9,7 +9,7 @@ export function AppTopbar() {
   const { data: session } = useSession()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
-  const trialEndsAt = (session as never)?.trialEndsAt
+  const trialEndsAt = session?.trialEndsAt ?? session?.user?.trialEndsAt
   const isTrialActive = trialEndsAt && new Date(trialEndsAt) > new Date()
   const daysRemaining = isTrialActive
     ? Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))

@@ -115,7 +115,7 @@ export async function generateChatResponse(
         role: 'assistant',
         content: response,
       },
-      grantRecommendations,
+      ...(grantRecommendations ? { grantRecommendations } : {}),
     }
   } catch (error) {
     return {
@@ -123,7 +123,7 @@ export async function generateChatResponse(
         role: 'assistant',
         content: 'I encountered an error processing your request. Please try again.',
       },
-      grantRecommendations,
+      ...(grantRecommendations ? { grantRecommendations } : {}),
     }
   }
 }

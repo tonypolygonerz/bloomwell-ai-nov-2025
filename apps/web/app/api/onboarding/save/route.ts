@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userId = (session as never).userId as string
+  const userId = session.userId ?? session.user.id
   if (!userId) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }
@@ -37,27 +37,27 @@ export async function POST(request: NextRequest) {
     await prisma.organization.upsert({
       where: { userId },
       update: {
-        ein: data.ein,
-        legalName: data.legalName,
-        mission: data.mission,
-        budget: data.budget,
-        staffSize: data.staffSize,
-        focusAreas: data.focusAreas,
-        revenueBracket: data.revenueBracket,
-        serviceGeo: data.serviceGeo,
-        fiscalYear: data.fiscalYear,
+        ein: data.ein ?? null,
+        legalName: data.legalName ?? null,
+        mission: data.mission ?? null,
+        budget: data.budget ?? null,
+        staffSize: data.staffSize ?? null,
+        focusAreas: data.focusAreas ?? null,
+        revenueBracket: data.revenueBracket ?? null,
+        serviceGeo: data.serviceGeo ?? null,
+        fiscalYear: data.fiscalYear ?? null,
       },
       create: {
         userId,
-        ein: data.ein,
-        legalName: data.legalName,
-        mission: data.mission,
-        budget: data.budget,
-        staffSize: data.staffSize,
-        focusAreas: data.focusAreas,
-        revenueBracket: data.revenueBracket,
-        serviceGeo: data.serviceGeo,
-        fiscalYear: data.fiscalYear,
+        ein: data.ein ?? null,
+        legalName: data.legalName ?? null,
+        mission: data.mission ?? null,
+        budget: data.budget ?? null,
+        staffSize: data.staffSize ?? null,
+        focusAreas: data.focusAreas ?? null,
+        revenueBracket: data.revenueBracket ?? null,
+        serviceGeo: data.serviceGeo ?? null,
+        fiscalYear: data.fiscalYear ?? null,
       },
     })
 

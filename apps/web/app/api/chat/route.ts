@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userId = (session as never).userId as string
+  const userId = session.userId ?? session.user.id
   if (!userId) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const response = await generateChatResponse(messages, {
       enableWebSearch,
       userId,
-      organizationId: organization?.id,
+      ...(organization?.id ? { organizationId: organization.id } : {}),
       context,
     })
 

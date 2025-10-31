@@ -19,7 +19,9 @@ export const authOptions: NextAuthOptions = {
           AzureADProvider({
             clientId: process.env.MICROSOFT_CLIENT_ID,
             clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-            ...(process.env.MICROSOFT_TENANT_ID && { tenantId: process.env.MICROSOFT_TENANT_ID }),
+            ...(process.env.MICROSOFT_TENANT_ID
+              ? { tenantId: process.env.MICROSOFT_TENANT_ID as string }
+              : {}),
           }),
         ]
       : []),
@@ -62,7 +64,7 @@ export const authOptions: NextAuthOptions = {
           select: { role: true, trialStartedAt: true, trialEndsAt: true },
         })
         if (dbUser) {
-          token.role = dbUser.role as string
+          token.role = dbUser.role as 'USER' | 'ADMIN'
           token.trialStartedAt = dbUser.trialStartedAt?.toISOString()
           token.trialEndsAt = dbUser.trialEndsAt?.toISOString()
         }
@@ -79,7 +81,7 @@ export const authOptions: NextAuthOptions = {
         }
       }
       if (trigger === 'update' && session) {
-        if ('role' in session) token.role = session.role as string
+        if ('role' in session) token.role = session.role as 'USER' | 'ADMIN'
         if ('trialEndsAt' in session) token.trialEndsAt = session.trialEndsAt as string
       }
       return token
@@ -87,6 +89,12 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.name = session.user.name ?? ''
+        session.user.id = token.userId ?? session.user.id
+        if (token.role) {
+          session.user.role = token.role
+        }
+        session.user.trialEndsAt = token.trialEndsAt ?? null
+        session.user.trialStartedAt = token.trialStartedAt ?? null
         session.userId = token.userId
         session.role = token.role
         session.trialStartedAt = token.trialStartedAt

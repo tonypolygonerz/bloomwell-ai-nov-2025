@@ -1,5 +1,5 @@
 import { OllamaCloudClient } from './providers/ollama'
-import prisma from '@bloomwell/db'
+import prisma, { Prisma } from '@bloomwell/db'
 
 export interface GrantRecommendation {
   grantId: string
@@ -40,7 +40,7 @@ export async function getGrantRecommendations(
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  let grantWhereClause: any
+  let grantWhereClause: Prisma.GrantWhereInput
 
   if (urgency === 'immediate') {
     const thirtyDaysFromNow = new Date(today)
