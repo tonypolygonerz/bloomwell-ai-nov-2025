@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dialog, Button } from '@bloomwell/ui'
 
@@ -41,4 +40,3 @@ export function GrantSearchPrompt({ isOpen, onClose, onComplete }: GrantSearchPr
     </Dialog>
   )
 }
-

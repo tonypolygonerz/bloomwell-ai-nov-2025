@@ -34,4 +34,3 @@ declare module 'next-auth/jwt' {
     trialEndsAt?: string | undefined
   }
 }
-

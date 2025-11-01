@@ -108,4 +108,3 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
   },
 }
-

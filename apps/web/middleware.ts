@@ -5,13 +5,14 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
-    
-    const isAuthPage = pathname.startsWith('/login') || 
-                       pathname.startsWith('/register') ||
-                       pathname.startsWith('/forgot-password')
-    
+
+    const isAuthPage =
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/register') ||
+      pathname.startsWith('/forgot-password')
+
     const isOnboardingPage = pathname.startsWith('/onboarding')
-    
+
     if (!token && !isAuthPage && !isOnboardingPage && pathname.startsWith('/app')) {
       return NextResponse.redirect(new URL('/login', req.url))
     }
@@ -26,11 +27,12 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        const isAuthPage = pathname.startsWith('/login') || 
-                           pathname.startsWith('/register') ||
-                           pathname.startsWith('/forgot-password')
+        const isAuthPage =
+          pathname.startsWith('/login') ||
+          pathname.startsWith('/register') ||
+          pathname.startsWith('/forgot-password')
         const isOnboardingPage = pathname.startsWith('/onboarding')
-        
+
         if (isAuthPage || isOnboardingPage) {
           return true
         }
@@ -38,10 +40,9 @@ export default withAuth(
         return !!token
       },
     },
-  }
+  },
 )
 
 export const config = {
   matcher: ['/app/:path*', '/login', '/register', '/forgot-password', '/onboarding/:path*'],
 }
-

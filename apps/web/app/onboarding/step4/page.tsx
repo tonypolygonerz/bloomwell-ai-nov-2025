@@ -76,8 +76,7 @@ export default function Step4Page() {
                     </div>
                     {organization.focusAreas && (
                       <div>
-                        <span className="font-medium">Focus Areas:</span>{' '}
-                        {organization.focusAreas}
+                        <span className="font-medium">Focus Areas:</span> {organization.focusAreas}
                       </div>
                     )}
                     {organization.serviceGeo && (
@@ -138,4 +137,3 @@ export default function Step4Page() {
     </div>
   )
 }
-

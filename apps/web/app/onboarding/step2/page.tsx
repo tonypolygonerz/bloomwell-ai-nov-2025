@@ -93,9 +93,7 @@ export default function Step2Page() {
               <div className="mt-2">
                 <Input
                   value={formData.serviceGeoDetails}
-                  onChange={(e) =>
-                    setFormData({ ...formData, serviceGeoDetails: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, serviceGeoDetails: e.target.value })}
                   placeholder="Enter counties, states, or countries"
                 />
               </div>
@@ -116,4 +114,3 @@ export default function Step2Page() {
     </div>
   )
 }
-

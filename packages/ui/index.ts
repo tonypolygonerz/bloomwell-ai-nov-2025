@@ -5,4 +5,3 @@ export * from './primitives/dialog'
 export * from './primitives/skeleton'
 export * from './primitives/badge'
 export * from './utils/cn'
-

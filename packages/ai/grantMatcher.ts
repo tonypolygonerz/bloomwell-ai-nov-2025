@@ -46,19 +46,13 @@ export async function getGrantRecommendations(
     const thirtyDaysFromNow = new Date(today)
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
     grantWhereClause = {
-      AND: [
-        { closeDate: { gte: today } },
-        { closeDate: { lte: thirtyDaysFromNow } },
-      ],
+      AND: [{ closeDate: { gte: today } }, { closeDate: { lte: thirtyDaysFromNow } }],
     }
   } else if (urgency === 'planning') {
     const ninetyDaysFromNow = new Date(today)
     ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90)
     grantWhereClause = {
-      AND: [
-        { closeDate: { gte: today } },
-        { closeDate: { lte: ninetyDaysFromNow } },
-      ],
+      AND: [{ closeDate: { gte: today } }, { closeDate: { lte: ninetyDaysFromNow } }],
     }
   } else {
     // long-term: All active grants
@@ -164,7 +158,7 @@ IMPORTANT: Return ONLY valid JSON, no additional text or markdown formatting.`
 
     // Parse JSON response - handle potential markdown code blocks
     let jsonString = response.trim()
-    
+
     // Remove markdown code blocks if present
     if (jsonString.startsWith('```')) {
       jsonString = jsonString.replace(/^```(?:json)?\n?/g, '').replace(/\n?```$/g, '')
@@ -212,4 +206,3 @@ IMPORTANT: Return ONLY valid JSON, no additional text or markdown formatting.`
     )
   }
 }
-

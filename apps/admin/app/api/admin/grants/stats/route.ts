@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import prisma from '@bloomwell/db'
 
-export async function GET() {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export async function GET(): Promise<NextResponse> {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -34,7 +35,9 @@ export async function GET() {
 
     return NextResponse.json({ total, active, expired })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch stats', details: String(error) }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to fetch stats', details: String(error) },
+      { status: 500 },
+    )
   }
 }
-

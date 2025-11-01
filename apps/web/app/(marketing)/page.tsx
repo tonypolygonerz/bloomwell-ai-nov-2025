@@ -191,7 +191,10 @@ export default function HomePage() {
                   Access our comprehensive database with thousands of grant opportunities. Search,
                   filter, and discover funding that matches your nonprofit's mission and needs.
                 </p>
-                <Link href="/register" className="inline-flex items-center gap-1 text-brand hover:underline">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-1 text-brand hover:underline"
+                >
                   Learn more
                   <svg
                     width="16"
@@ -262,7 +265,10 @@ export default function HomePage() {
                   Get instant expert answers to your grant writing questions. Our AI assistant
                   provides personalized guidance, tips, and strategies 24/7 to help you succeed.
                 </p>
-                <Link href="/register" className="inline-flex items-center gap-1 text-brand hover:underline">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-1 text-brand hover:underline"
+                >
                   Learn more
                   <svg
                     width="16"
@@ -312,7 +318,10 @@ export default function HomePage() {
                   Join monthly live webinars with nonprofit experts. Learn best practices, get your
                   questions answered in real-time, and network with other nonprofit professionals.
                 </p>
-                <Link href="/register" className="inline-flex items-center gap-1 text-brand hover:underline">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-1 text-brand hover:underline"
+                >
                   Learn more
                   <svg
                     width="16"
@@ -353,9 +362,7 @@ export default function HomePage() {
             }}
           />
           <div className="relative z-10 mx-auto max-w-7xl px-4 text-center">
-            <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-              Comprehensive Grant Database
-            </h2>
+            <h2 className="mb-4 text-4xl font-bold md:text-5xl">Comprehensive Grant Database</h2>
             <p className="mx-auto mb-12 max-w-3xl text-lg md:text-xl">
               Access the most complete and up-to-date federal grant database, intelligently
               categorized by our AI for your nonprofit's success
@@ -484,4 +491,3 @@ export default function HomePage() {
     </div>
   )
 }
-

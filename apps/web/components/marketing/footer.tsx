@@ -7,8 +7,8 @@ export function MarketingFooter() {
         <div className="mb-8">
           <h3 className="mb-4 text-lg font-semibold">Bloomwell AI</h3>
           <p className="text-gray-300">
-            Empowering nonprofits with AI-driven grant discovery and management tools. Find
-            funding faster, save time and grow your impact.
+            Empowering nonprofits with AI-driven grant discovery and management tools. Find funding
+            faster, save time and grow your impact.
           </p>
         </div>
 
@@ -112,4 +112,3 @@ export function MarketingFooter() {
     </footer>
   )
 }
-

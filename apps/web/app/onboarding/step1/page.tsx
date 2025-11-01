@@ -115,9 +115,7 @@ export default function Step1Page() {
               </div>
               {orgData && (
                 <div className="mt-2 rounded-lg bg-green-50 p-3">
-                  <p className="text-sm font-medium text-green-800">
-                    ✓ Found: {orgData.legalName}
-                  </p>
+                  <p className="text-sm font-medium text-green-800">✓ Found: {orgData.legalName}</p>
                   <p className="text-xs text-green-700">EIN: {orgData.ein}</p>
                 </div>
               )}
@@ -126,10 +124,7 @@ export default function Step1Page() {
         </div>
 
         <div className="flex justify-between">
-          <button
-            onClick={() => router.push('/app')}
-            className="text-gray-600 hover:text-brand"
-          >
+          <button onClick={() => router.push('/app')} className="text-gray-600 hover:text-brand">
             ← Back
           </button>
           <div className="flex gap-3">
@@ -148,4 +143,3 @@ export default function Step1Page() {
     </div>
   )
 }
-

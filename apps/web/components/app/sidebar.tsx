@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 
@@ -37,34 +36,37 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
             <span>🏠</span>
             <span>Dashboard</span>
           </Link>
-          <Link
+          {/* TODO: Create /app/chat/new page */}
+          {/* <Link
             href="/app/chat/new"
             className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
           >
             <span>➕</span>
             <span>Start New Chat</span>
-          </Link>
+          </Link> */}
           <Link
-            href="/app/webinars"
+            href="/webinars"
             className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
           >
             <span>📚</span>
             <span>Webinars</span>
           </Link>
-          <Link
+          {/* TODO: Create /app/chats page */}
+          {/* <Link
             href="/app/chats"
             className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
           >
             <span>💬</span>
             <span>Chats</span>
-          </Link>
-          <Link
+          </Link> */}
+          {/* TODO: Create /app/projects page */}
+          {/* <Link
             href="/app/projects"
             className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
           >
             <span>📁</span>
             <span>Projects</span>
-          </Link>
+          </Link> */}
         </nav>
       )}
       {!isCollapsed && (
@@ -76,15 +78,15 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
               <p className="text-xs text-gray-600">{session?.user?.email}</p>
             </div>
           </div>
-          <Link
+          {/* TODO: Create /app/settings page */}
+          {/* <Link
             href="/app/settings"
             className="mt-2 block text-sm text-gray-600 hover:text-brand"
           >
             Settings
-          </Link>
+          </Link> */}
         </div>
       )}
     </aside>
   )
 }
-

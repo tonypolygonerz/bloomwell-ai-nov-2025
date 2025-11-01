@@ -3,12 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@bloomwell/ui": [
-        "../../packages/ui"
-      ],
-      "@/*": [
-        "./*"
-      ]
+      "@bloomwell/ui": ["../../packages/ui"],
+      "@/*": ["./*"]
     },
     "noEmit": true,
     "incremental": true,
@@ -18,13 +14,6 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

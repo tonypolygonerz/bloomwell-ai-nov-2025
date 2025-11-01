@@ -41,10 +41,7 @@ export async function POST(request: NextRequest) {
     // Note: In production, implement proper token tracking in database
     // For now, we'll proceed with the request
 
-    const messages = [
-      ...history,
-      { role: 'user' as const, content: message },
-    ]
+    const messages = [...history, { role: 'user' as const, content: message }]
 
     // Extract context from current message and recent conversation history
     const recentHistory = history.slice(-5) // Last 5 messages for context
@@ -80,4 +77,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-

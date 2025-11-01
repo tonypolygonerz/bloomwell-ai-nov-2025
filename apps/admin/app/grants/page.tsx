@@ -9,7 +9,8 @@ interface GrantStats {
   expired: number
 }
 
-export default function GrantsPage() {
+// eslint-disable-next-line @typescript-eslint/naming-convention, max-lines-per-function
+export default function GrantsPage(): JSX.Element {
   const [stats, setStats] = useState<GrantStats>({ total: 0, active: 0, expired: 0 })
   const [isSyncing, setIsSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{
@@ -23,7 +24,7 @@ export default function GrantsPage() {
     fetchStats()
   }, [])
 
-  const fetchStats = async () => {
+  const fetchStats = async (): Promise<void> => {
     try {
       const response = await fetch('/api/admin/grants/stats')
       if (response.ok) {
@@ -31,11 +32,12 @@ export default function GrantsPage() {
         setStats(data)
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to fetch stats:', error)
     }
   }
 
-  const handleSync = async () => {
+  const handleSync = async (): Promise<void> => {
     setIsSyncing(true)
     setSyncResult(null)
 
@@ -125,4 +127,3 @@ export default function GrantsPage() {
     </div>
   )
 }
-

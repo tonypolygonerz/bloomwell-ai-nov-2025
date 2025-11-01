@@ -57,20 +57,16 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <h1 className="mb-2 text-2xl font-bold">Create Your Account</h1>
-        <p className="mb-6 text-gray-600">Join thousands of nonprofits already using Bloomwell AI</p>
+        <p className="mb-6 text-gray-600">
+          Join thousands of nonprofits already using Bloomwell AI
+        </p>
 
         {isOAuthVisible && (
           <div className="mb-4 space-y-2">
-            <Button
-              className="w-full"
-              onClick={() => signIn('google', { callbackUrl: '/app' })}
-            >
+            <Button className="w-full" onClick={() => signIn('google', { callbackUrl: '/app' })}>
               Continue with Google
             </Button>
-            <Button
-              className="w-full"
-              onClick={() => signIn('azure-ad', { callbackUrl: '/app' })}
-            >
+            <Button className="w-full" onClick={() => signIn('azure-ad', { callbackUrl: '/app' })}>
               Continue with Microsoft 365
             </Button>
           </div>
@@ -156,4 +152,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-

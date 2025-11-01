@@ -9,6 +9,7 @@ The onboarding flow has been reorganized into 4 logical steps that progressively
 **Purpose:** Establish organization identity and eligibility type
 
 **Fields:**
+
 - Organization Type (required)
   - US Registered 501(c)(3) Nonprofit
   - Freelance Grant Writer / Grant Writing Agency
@@ -28,6 +29,7 @@ The onboarding flow has been reorganized into 4 logical steps that progressively
 **Purpose:** Understand organization's purpose and scope for grant matching
 
 **Fields:**
+
 - Mission Statement (required for completion)
   - Describe what the organization does and who it serves
   - Used for semantic matching with grant opportunities
@@ -48,6 +50,7 @@ The onboarding flow has been reorganized into 4 logical steps that progressively
 **Purpose:** Assess organizational capacity to handle grants and identify appropriate grant sizes
 
 **Fields:**
+
 - Annual Operating Budget
   - Budget ranges: <$90K to $10M+
   - Helps determine grant size appropriateness
@@ -75,6 +78,7 @@ The onboarding flow has been reorganized into 4 logical steps that progressively
 **Purpose:** Confirm all information before unlocking full features
 
 **Features:**
+
 - Organized review by category:
   - Organization Identity
   - Mission & Focus
@@ -86,6 +90,7 @@ The onboarding flow has been reorganized into 4 logical steps that progressively
 ## Completion Logic
 
 Onboarding is considered complete when:
+
 - **Mission statement exists** (from Step 2 - critical for matching)
 - **At least one capacity field exists** (budget, revenue, or staff size from Step 3)
 
@@ -106,4 +111,3 @@ This ensures users provide the minimum information needed for effective grant ma
 - Profile can be edited anytime in Settings after completion
 - Completion status checked via `/api/onboarding/status`
 - Banner component shows encouragement but doesn't block access
-

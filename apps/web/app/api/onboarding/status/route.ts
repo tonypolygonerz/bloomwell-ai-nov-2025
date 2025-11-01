@@ -24,12 +24,9 @@ export async function GET() {
   // - At least one capacity field (budget, revenue, or staff size from Step 3)
   const hasMission = !!organization?.mission
   const hasCapacityInfo =
-    !!organization?.budget ||
-    !!organization?.revenueBracket ||
-    !!organization?.staffSize
+    !!organization?.budget || !!organization?.revenueBracket || !!organization?.staffSize
 
   const isComplete = hasMission && hasCapacityInfo
 
   return NextResponse.json({ isComplete, organization })
 }
-

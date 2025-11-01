@@ -26,4 +26,3 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ error: 'Missing ein or query parameter' }, { status: 400 })
 }
-

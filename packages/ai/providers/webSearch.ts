@@ -18,11 +18,14 @@ export class BraveSearchClient {
 
   async search(query: string, count = 5): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}?q=${encodeURIComponent(query)}&count=${count}`, {
-        headers: {
-          'X-Subscription-Token': this.apiKey,
+      const response = await fetch(
+        `${this.baseUrl}?q=${encodeURIComponent(query)}&count=${count}`,
+        {
+          headers: {
+            'X-Subscription-Token': this.apiKey,
+          },
         },
-      })
+      )
 
       if (!response.ok) {
         return ''
@@ -36,13 +39,10 @@ export class BraveSearchClient {
       }
 
       return results
-        .map(
-          (r) => `Title: ${r.title}\nURL: ${r.url}\nDescription: ${r.description}`,
-        )
+        .map((r) => `Title: ${r.title}\nURL: ${r.url}\nDescription: ${r.description}`)
         .join('\n\n')
     } catch {
       return ''
     }
   }
 }
-

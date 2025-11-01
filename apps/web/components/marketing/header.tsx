@@ -16,10 +16,7 @@ export function MarketingHeader() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path
-                d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z"
-                fill="white"
-              />
+              <path d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z" fill="white" />
             </svg>
           </div>
           <span className="text-xl font-bold text-black">Bloomwell AI</span>
@@ -72,4 +69,3 @@ export function MarketingHeader() {
     </header>
   )
 }
-

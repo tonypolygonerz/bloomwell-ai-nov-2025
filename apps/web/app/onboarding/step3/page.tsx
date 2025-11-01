@@ -26,15 +26,7 @@ const revenueBrackets = [
   '$10M+',
 ]
 
-const staffSizeOptions = [
-  '1-5',
-  '6-10',
-  '11-25',
-  '26-50',
-  '51-100',
-  '101-500',
-  '500+',
-]
+const staffSizeOptions = ['1-5', '6-10', '11-25', '26-50', '51-100', '101-500', '500+']
 
 const grantActivity = ['0 grants', '1-5', '6-10', '11-15', '16-50', '50+']
 
@@ -190,4 +182,3 @@ export default function Step3Page() {
     </div>
   )
 }
-

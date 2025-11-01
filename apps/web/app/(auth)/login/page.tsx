@@ -35,16 +35,10 @@ export default function LoginPage() {
 
         {isOAuthVisible && (
           <div className="mb-4 space-y-2">
-            <Button
-              className="w-full"
-              onClick={() => signIn('google', { callbackUrl: '/app' })}
-            >
+            <Button className="w-full" onClick={() => signIn('google', { callbackUrl: '/app' })}>
               Continue with Google
             </Button>
-            <Button
-              className="w-full"
-              onClick={() => signIn('azure-ad', { callbackUrl: '/app' })}
-            >
+            <Button className="w-full" onClick={() => signIn('azure-ad', { callbackUrl: '/app' })}>
               Continue with Microsoft 365
             </Button>
           </div>
@@ -103,4 +97,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

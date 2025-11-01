@@ -20,4 +20,3 @@ export const Button: React.FC<ButtonProps> = ({ className = '', size = 'default'
     />
   )
 }
-

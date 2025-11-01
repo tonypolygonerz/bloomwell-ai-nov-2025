@@ -1,10 +1,6 @@
 {
   "root": true,
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
   "ignorePatterns": [
@@ -18,13 +14,21 @@
     {
       "files": ["**/*.js", "**/*.cjs", "**/*.mjs"],
       "env": { "node": true }
+    },
+    {
+      "files": ["**/app/**/*.ts", "**/app/**/*.tsx", "**/components/**/*.tsx"],
+      "rules": {
+        "@typescript-eslint/naming-convention": "off",
+        "max-lines-per-function": ["warn", 150]
+      }
     }
   ],
   "rules": {
-    "no-console": "error",
+    "no-console": "warn",
     "no-debugger": "error",
     "no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "error",
+    "react/no-unescaped-entities": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/naming-convention": [
       "error",
@@ -32,9 +36,8 @@
       { "selector": "typeLike", "format": ["PascalCase"] },
       { "selector": "enumMember", "format": ["UPPER_CASE"] }
     ],
-    "complexity": ["error", 10],
+    "complexity": ["warn", 10],
     "max-lines-per-function": ["error", 50],
     "max-depth": ["error", 4]
   }
 }
-

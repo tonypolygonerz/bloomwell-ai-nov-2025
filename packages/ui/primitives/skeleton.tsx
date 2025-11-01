@@ -8,4 +8,3 @@ export interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({ className }) => {
   return <div className={cn('animate-pulse rounded-md bg-gray-200', className)} />
 }
-

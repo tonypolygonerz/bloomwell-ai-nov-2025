@@ -26,4 +26,3 @@ export const Dialog: React.FC<DialogProps> = ({ open, onClose, children, classNa
     </div>
   )
 }
-

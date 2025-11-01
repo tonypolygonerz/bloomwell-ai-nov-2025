@@ -8,7 +8,7 @@ import Link from 'next/link'
 export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [isComplete, setIsComplete] = useState<boolean | null>(null)
+  const [, setIsComplete] = useState<boolean | null>(null)
   const [showBanner, setShowBanner] = useState(false)
 
   useEffect(() => {
@@ -74,4 +74,3 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
     </>
   )
 }
-

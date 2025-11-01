@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Input } from '@bloomwell/ui'
-import Link from 'next/link'
+import { Input } from '@bloomwell/ui'
 
 export default function DashboardPage() {
   const [message, setMessage] = useState('')
@@ -62,7 +61,9 @@ export default function DashboardPage() {
           <div className="mx-auto max-w-3xl">
             <h2 className="mb-6 text-2xl font-bold">
               Start a conversation. Ask me anything about{' '}
-              <span className="text-brand">nonprofit management, grants or organizational development</span>
+              <span className="text-brand">
+                nonprofit management, grants or organizational development
+              </span>
             </h2>
             <div className="mb-8 grid gap-4 md:grid-cols-2">
               {quickActions.map((action, idx) => (
@@ -85,9 +86,7 @@ export default function DashboardPage() {
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-4 ${
-                    msg.role === 'user'
-                      ? 'bg-brand text-white'
-                      : 'bg-gray-100 text-gray-900'
+                    msg.role === 'user' ? 'bg-brand text-white' : 'bg-gray-100 text-gray-900'
                   }`}
                 >
                   {msg.content}
@@ -145,4 +144,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

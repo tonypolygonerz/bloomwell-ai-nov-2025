@@ -173,7 +173,11 @@ Please try again in a moment. If the problem continues, try simplifying your que
   }
 
   // Authentication errors
-  if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Authentication failed')) {
+  if (
+    errorMsg.includes('401') ||
+    errorMsg.includes('403') ||
+    errorMsg.includes('Authentication failed')
+  ) {
     return `🔐 **Authentication Error**
 
 Your API credentials appear to be invalid or expired.
@@ -215,4 +219,3 @@ ${errorMsg.substring(0, 300)}
 
 If this error persists, please contact support for assistance.`
 }
-

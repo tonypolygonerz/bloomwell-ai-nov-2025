@@ -14,8 +14,7 @@ export const generateWebinarConfig = (webinarId: string, role: WebinarRole) => (
       role === 'admin'
         ? ['microphone', 'camera', 'recording', 'participants', 'chat', 'desktop']
         : role === 'guest'
-        ? ['microphone', 'camera', 'chat']
-        : ['chat'],
+          ? ['microphone', 'camera', 'chat']
+          : ['chat'],
   },
 })
-

@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import { syncGrants } from '@/lib/grantsSync'
 
-export async function POST(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export async function POST(): Promise<NextResponse> {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -21,4 +22,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Sync failed', details: String(error) }, { status: 500 })
   }
 }
-

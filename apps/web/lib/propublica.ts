@@ -20,11 +20,14 @@ export async function searchProPublicaOrg(ein: string): Promise<ProPublicaOrg | 
   }
 
   try {
-    const response = await fetch(`https://projects.propublica.org/nonprofits/api/v2/organizations/${ein}.json`, {
-      headers: {
-        'User-Agent': 'Bloomwell-AI/1.0',
+    const response = await fetch(
+      `https://projects.propublica.org/nonprofits/api/v2/organizations/${ein}.json`,
+      {
+        headers: {
+          'User-Agent': 'Bloomwell-AI/1.0',
+        },
       },
-    })
+    )
 
     if (!response.ok) {
       return null
@@ -63,4 +66,3 @@ export async function searchProPublicaByName(query: string): Promise<ProPublicaO
     return []
   }
 }
-
