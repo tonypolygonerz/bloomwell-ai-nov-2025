@@ -34,8 +34,18 @@ export async function generateChatResponse(
     }
   }
 
-  const ollamaClient = new OllamaCloudClient(apiKey)
-  const model = options.model ?? 'deepseek-chat'
+  const ollamaClient = new OllamaCloudClient({ apiKey })
+
+  // Dynamically select the largest DeepSeek model unless explicitly specified
+  let model = options.model
+  if (!model) {
+    try {
+      model = await ollamaClient.getLargestDeepSeekModel()
+    } catch (error) {
+      console.error('Failed to get largest DeepSeek model, using fallback:', error)
+      model = 'deepseek-chat'
+    }
+  }
 
   // Detect funding-related keywords
   const fundingKeywords = ['grant', 'funding', 'money', 'budget', 'financial', 'donate']
@@ -118,13 +128,91 @@ export async function generateChatResponse(
       ...(grantRecommendations ? { grantRecommendations } : {}),
     }
   } catch (error) {
+    console.error('Ollama API Error:', error)
+    const errorMessage = formatChatError(error)
     return {
       message: {
         role: 'assistant',
-        content: 'I encountered an error processing your request. Please try again.',
+        content: errorMessage,
       },
       ...(grantRecommendations ? { grantRecommendations } : {}),
     }
   }
+}
+
+// Enhanced error formatting function
+function formatChatError(error: any): string {
+  if (!error) {
+    return 'An unknown error occurred. Please try again.'
+  }
+
+  const errorMsg = error.message || String(error)
+
+  // Network connectivity errors
+  if (errorMsg.includes('Network connection failed') || errorMsg.includes('DNS resolution')) {
+    return `🌐 **Connection Error**
+
+Unable to reach the AI service. This could be due to:
+- Internet connectivity issues
+- DNS resolution problems
+- Firewall blocking the connection
+
+Please check your internet connection and try again. If the issue persists, contact support.`
+  }
+
+  // Timeout errors
+  if (errorMsg.includes('timeout') || errorMsg.includes('timed out')) {
+    return `⏱️ **Timeout Error**
+
+The AI service took too long to respond. This may be due to:
+- High server load
+- Complex request processing
+- Network latency
+
+Please try again in a moment. If the problem continues, try simplifying your question.`
+  }
+
+  // Authentication errors
+  if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Authentication failed')) {
+    return `🔐 **Authentication Error**
+
+Your API credentials appear to be invalid or expired.
+
+Please verify your Ollama Cloud API key configuration. If you're an administrator, check the OLLAMA_CLOUD_API_KEY environment variable.`
+  }
+
+  // Rate limiting
+  if (errorMsg.includes('429') || errorMsg.includes('Rate limit')) {
+    return `🚦 **Rate Limit Exceeded**
+
+You've made too many requests in a short period.
+
+Please wait a moment before trying again. If you're experiencing this frequently, consider upgrading your API plan.`
+  }
+
+  // Service errors
+  if (errorMsg.includes('500') || errorMsg.includes('503') || errorMsg.includes('service error')) {
+    return `⚠️ **Service Unavailable**
+
+The AI service is temporarily unavailable. This is usually brief.
+
+Please try again in a few moments. If the issue persists, the service may be undergoing maintenance.`
+  }
+
+  // Endpoint not found
+  if (errorMsg.includes('404') || errorMsg.includes('Endpoint not found')) {
+    return `🔍 **Service Configuration Error**
+
+The AI service endpoint could not be found. This may indicate an API version mismatch.
+
+Please contact support with this error message: ${errorMsg.substring(0, 200)}`
+  }
+
+  // Generic error with details
+  return `🤖 **AI Service Error**
+
+${errorMsg.substring(0, 300)}
+
+If this error persists, please contact support for assistance.`
 }
 
