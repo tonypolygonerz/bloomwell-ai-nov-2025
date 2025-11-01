@@ -204,8 +204,14 @@ export class OllamaCloudClient {
         return 'deepseek-chat';
       }
 
-      const largest = deepSeekModels[0].name;
-      const sizeGB = (deepSeekModels[0].size / 1e9).toFixed(0);
+      const largestModel = deepSeekModels[0];
+      if (!largestModel) {
+        console.warn('⚠️ No DeepSeek model found, falling back to deepseek-chat');
+        return 'deepseek-chat';
+      }
+
+      const largest = largestModel.name;
+      const sizeGB = (largestModel.size / 1e9).toFixed(0);
       console.log(`🎯 Selected largest DeepSeek model: ${largest} (${sizeGB}GB)`);
       return largest;
 

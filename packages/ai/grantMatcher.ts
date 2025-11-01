@@ -142,7 +142,7 @@ IMPORTANT: Return ONLY valid JSON, no additional text or markdown formatting.`
     throw new Error('OLLAMA_CLOUD_API_KEY environment variable is not set')
   }
 
-  const ollamaClient = new OllamaCloudClient(apiKey)
+  const ollamaClient = new OllamaCloudClient({ apiKey })
   const model = 'deepseek-chat'
 
   try {
