@@ -5,6 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import type { NextAuthOptions } from 'next-auth'
 import prisma from '@bloomwell/db'
 import { compare } from 'bcryptjs'
+import { getUserSubscription } from '@bloomwell/stripe'
 import './types'
 
 export const authOptions: NextAuthOptions = {
@@ -61,12 +62,26 @@ export const authOptions: NextAuthOptions = {
         token.userId = user.id
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { role: true, trialStartedAt: true, trialEndsAt: true },
+          select: {
+            role: true,
+            trialStartedAt: true,
+            trialEndsAt: true,
+            subscriptionStatus: true,
+            currentPriceId: true,
+          },
         })
         if (dbUser) {
           token.role = dbUser.role as 'USER' | 'ADMIN'
           token.trialStartedAt = dbUser.trialStartedAt?.toISOString()
           token.trialEndsAt = dbUser.trialEndsAt?.toISOString()
+          token.subscriptionStatus = dbUser.subscriptionStatus
+          token.subscriptionPriceId = dbUser.currentPriceId
+          
+          // Get subscription tier from price ID
+          if (dbUser.currentPriceId) {
+            const subscription = await getUserSubscription(user.id)
+            token.subscriptionTier = subscription.tier
+          }
         }
         if (!dbUser?.trialStartedAt) {
           await prisma.user.update({
@@ -80,9 +95,25 @@ export const authOptions: NextAuthOptions = {
           token.trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
         }
       }
+      
+      // Update subscription info on each token refresh (but not on every request to avoid overhead)
+      // Only refresh if token doesn't have subscription info or if explicitly triggered
+      if (token.userId && (!token.subscriptionStatus || trigger === 'update')) {
+        const subscription = await getUserSubscription(token.userId)
+        token.subscriptionStatus = subscription.status
+        token.subscriptionTier = subscription.tier
+        token.subscriptionPriceId = subscription.priceId
+      }
+      
       if (trigger === 'update' && session) {
         if ('role' in session) token.role = session.role as 'USER' | 'ADMIN'
         if ('trialEndsAt' in session) token.trialEndsAt = session.trialEndsAt as string
+        if ('subscriptionStatus' in session)
+          token.subscriptionStatus = session.subscriptionStatus as string | null
+        if ('subscriptionTier' in session)
+          token.subscriptionTier = session.subscriptionTier as 'starter' | 'enterprise' | null
+        if ('subscriptionPriceId' in session)
+          token.subscriptionPriceId = session.subscriptionPriceId as string | null
       }
       return token
     },
@@ -99,6 +130,9 @@ export const authOptions: NextAuthOptions = {
         session.role = token.role
         session.trialStartedAt = token.trialStartedAt
         session.trialEndsAt = token.trialEndsAt
+        session.subscriptionStatus = token.subscriptionStatus ?? null
+        session.subscriptionTier = token.subscriptionTier ?? null
+        session.subscriptionPriceId = token.subscriptionPriceId ?? null
       }
       return session
     },

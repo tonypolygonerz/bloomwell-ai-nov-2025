@@ -19,9 +19,26 @@ export default function Step4Page() {
   }, [])
 
   const handleComplete = async () => {
-    // Onboarding is considered complete when user reaches this step
-    // The organization data is already saved from previous steps
-    router.push('/app')
+    // Onboarding data is already saved from previous steps
+    // Check if full completion is met, otherwise show what's missing
+    try {
+      const response = await fetch('/api/onboarding/status')
+      const data = await response.json()
+      
+      if (data.isFullComplete) {
+        router.push('/app')
+      } else {
+        // If not fully complete, redirect to appropriate step
+        if (!data.organization?.mission) {
+          router.push('/onboarding/step2')
+        } else {
+          router.push('/onboarding/step3')
+        }
+      }
+    } catch (error) {
+      // Fallback to dashboard
+      router.push('/app')
+    }
   }
 
   if (isLoading) {
@@ -41,12 +58,21 @@ export default function Step4Page() {
         </p>
 
         <div className="mb-6 space-y-6">
-          <div className="rounded-lg bg-green-50 p-4">
-            <p className="font-semibold text-green-800">✓ Profile Information Complete</p>
-            <p className="mt-1 text-xs text-green-700">
-              Your profile helps us find the best grant opportunities for your organization.
-            </p>
-          </div>
+          {organization?.mission && (organization?.budget || organization?.revenueBracket || organization?.staffSize) ? (
+            <div className="rounded-lg bg-green-50 p-4">
+              <p className="font-semibold text-green-800">✓ Profile Information Complete</p>
+              <p className="mt-1 text-xs text-green-700">
+                Your profile helps us find the best grant opportunities for your organization.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg bg-yellow-50 p-4">
+              <p className="font-semibold text-yellow-800">Profile Partially Complete</p>
+              <p className="mt-1 text-xs text-yellow-700">
+                Complete your mission and capacity details to unlock personalized grant recommendations.
+              </p>
+            </div>
+          )}
 
           {organization && (
             <div className="space-y-4">

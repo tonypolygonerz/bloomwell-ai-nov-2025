@@ -15,6 +15,9 @@ declare module 'next-auth' {
     role?: 'USER' | 'ADMIN' | undefined
     trialStartedAt?: string | undefined
     trialEndsAt?: string | undefined
+    subscriptionStatus?: string | null
+    subscriptionTier?: 'starter' | 'enterprise' | null
+    subscriptionPriceId?: string | null
   }
 
   interface User {
@@ -32,5 +35,8 @@ declare module 'next-auth/jwt' {
     role?: 'USER' | 'ADMIN' | undefined
     trialStartedAt?: string | undefined
     trialEndsAt?: string | undefined
+    subscriptionStatus?: string | null
+    subscriptionTier?: 'starter' | 'enterprise' | null
+    subscriptionPriceId?: string | null
   }
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 
 export function MarketingFooter() {
@@ -14,7 +16,13 @@ export function MarketingFooter() {
 
         <div className="mb-8">
           <h4 className="mb-2 text-sm font-semibold">Stay Updated</h4>
-          <form className="flex gap-2">
+          <form
+            className="flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault()
+              // Newsletter subscription functionality can be added here
+            }}
+          >
             <input
               type="email"
               placeholder="Enter your email"

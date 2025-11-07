@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, Card } from '@bloomwell/ui'
+import { Button, Card, Input } from '@bloomwell/ui'
+import { ProgressIndicator } from '@/components/auth/progress-indicator'
 
 const budgetOptions = [
   '<$90K',
@@ -10,80 +11,171 @@ const budgetOptions = [
   '$200K-$500K',
   '$500K-$750K',
   '$750K-$1M',
-  '$1M-$5M',
-  '$5M-$10M',
-  '$10M+',
 ]
 
-const revenueBrackets = [
-  '<$90K',
-  '$90K-$200K',
-  '$200K-$500K',
-  '$500K-$750K',
-  '$750K-$1M',
-  '$1M-$5M',
-  '$5M-$10M',
-  '$10M+',
-]
+const staffSizeOptions = ['1-5', '6-10', '11-25', '26-50', '51-100', '101-500']
 
-const staffSizeOptions = ['1-5', '6-10', '11-25', '26-50', '51-100', '101-500', '500+']
-
-const grantActivity = ['0 grants', '1-5', '6-10', '11-15', '16-50', '50+']
-
-const fiscalYearOptions = [
-  'January-December',
-  'February-January',
-  'March-February',
-  'April-March',
-  'May-April',
-  'June-May',
-  'July-June',
-  'August-July',
-  'September-August',
-  'October-September',
-  'November-October',
-  'December-November',
+const usStates = [
+  'Alabama',
+  'Alaska',
+  'Arizona',
+  'Arkansas',
+  'California',
+  'Colorado',
+  'Connecticut',
+  'Delaware',
+  'District of Columbia',
+  'Florida',
+  'Georgia',
+  'Hawaii',
+  'Idaho',
+  'Illinois',
+  'Indiana',
+  'Iowa',
+  'Kansas',
+  'Kentucky',
+  'Louisiana',
+  'Maine',
+  'Maryland',
+  'Massachusetts',
+  'Michigan',
+  'Minnesota',
+  'Mississippi',
+  'Missouri',
+  'Montana',
+  'Nebraska',
+  'Nevada',
+  'New Hampshire',
+  'New Jersey',
+  'New Mexico',
+  'New York',
+  'North Carolina',
+  'North Dakota',
+  'Ohio',
+  'Oklahoma',
+  'Oregon',
+  'Pennsylvania',
+  'Rhode Island',
+  'South Carolina',
+  'South Dakota',
+  'Tennessee',
+  'Texas',
+  'Utah',
+  'Vermont',
+  'Virginia',
+  'Washington',
+  'West Virginia',
+  'Wisconsin',
+  'Wyoming',
 ]
 
 export default function Step3Page() {
   const router = useRouter()
   const [formData, setFormData] = useState({
+    mission: '',
+    focusAreas: '',
     budget: '',
-    revenueBracket: '',
     staffSize: '',
-    recentGrantActivity: '',
-    fiscalYear: '',
+    state: '',
   })
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleContinue = async () => {
-    await fetch('/api/onboarding/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
+    if (!formData.mission || !formData.budget || !formData.staffSize || !formData.state) {
+      return
+    }
 
-    router.push('/onboarding/step4')
+    setIsLoading(true)
+    try {
+      await fetch('/api/onboarding/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mission: formData.mission || undefined,
+          focusAreas: formData.focusAreas || undefined,
+          budget: formData.budget || undefined,
+          staffSize: formData.staffSize || undefined,
+          state: formData.state || undefined,
+        }),
+      })
+
+      router.push('/app')
+    } catch (error) {
+      console.error('Error saving data:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSkip = async () => {
+    setIsLoading(true)
+    try {
+      await fetch('/api/onboarding/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mission: formData.mission || undefined,
+          focusAreas: formData.focusAreas || undefined,
+          budget: formData.budget || undefined,
+          staffSize: formData.staffSize || undefined,
+          state: formData.state || undefined,
+        }),
+      })
+
+      router.push('/app')
+    } catch (error) {
+      console.error('Error saving data:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-8">
       <Card className="w-full max-w-2xl p-8">
-        <h2 className="mb-2 text-2xl font-bold">Step 3: Your Capacity</h2>
-        <p className="mb-6 text-sm text-gray-600">
-          Help us understand your organization's financial profile and grant experience to match you
-          with appropriate funding opportunities.
-        </p>
+        <ProgressIndicator currentStep={3} totalSteps={3} />
 
-        <div className="mb-6 space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleContinue(); }} className="space-y-5">
+          {/* Mission Statement */}
           <div>
-            <label className="mb-2 block text-sm font-medium">Annual Operating Budget</label>
-            <p className="mb-2 text-xs text-gray-500">
-              Your organization's annual budget for programs and operations
-            </p>
+            <label htmlFor="mission" className="mb-2 block text-sm font-semibold text-gray-700">
+              Mission Statement <span className="text-red-600">*</span>
+            </label>
+            <textarea
+              id="mission"
+              value={formData.mission}
+              onChange={(e) => setFormData({ ...formData, mission: e.target.value })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+              rows={4}
+              placeholder="Describe what your organization does and who you serve"
+              required
+            />
+          </div>
+
+          {/* Focus Areas */}
+          <div>
+            <label htmlFor="focusAreas" className="mb-2 block text-sm font-semibold text-gray-700">
+              Focus Areas <span className="text-xs font-normal text-gray-500">(Optional)</span>
+            </label>
+            <Input
+              id="focusAreas"
+              value={formData.focusAreas}
+              onChange={(e) => setFormData({ ...formData, focusAreas: e.target.value })}
+              placeholder="e.g., education, healthcare, environment"
+            />
+          </div>
+
+          {/* Budget */}
+          <div>
+            <label htmlFor="budget" className="mb-2 block text-sm font-semibold text-gray-700">
+              Annual Budget <span className="text-red-600">*</span>
+            </label>
             <select
+              id="budget"
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-              className="w-full rounded-md border border-gray-300 p-3"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+              required
             >
               <option value="">Select budget range</option>
               {budgetOptions.map((opt) => (
@@ -94,32 +186,17 @@ export default function Step3Page() {
             </select>
           </div>
 
+          {/* Staff Size */}
           <div>
-            <label className="mb-2 block text-sm font-medium">Annual Revenue</label>
-            <p className="mb-2 text-xs text-gray-500">
-              Total annual revenue from all sources (grants, donations, program fees, etc.)
-            </p>
+            <label htmlFor="staffSize" className="mb-2 block text-sm font-semibold text-gray-700">
+              Staff Size <span className="text-red-600">*</span>
+            </label>
             <select
-              value={formData.revenueBracket}
-              onChange={(e) => setFormData({ ...formData, revenueBracket: e.target.value })}
-              className="w-full rounded-md border border-gray-300 p-3"
-            >
-              <option value="">Select revenue bracket</option>
-              {revenueBrackets.map((bracket) => (
-                <option key={bracket} value={bracket}>
-                  {bracket}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium">Staff Size</label>
-            <p className="mb-2 text-xs text-gray-500">Number of full-time equivalent employees</p>
-            <select
+              id="staffSize"
               value={formData.staffSize}
               onChange={(e) => setFormData({ ...formData, staffSize: e.target.value })}
-              className="w-full rounded-md border border-gray-300 p-3"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+              required
             >
               <option value="">Select staff size</option>
               {staffSizeOptions.map((opt) => (
@@ -130,54 +207,53 @@ export default function Step3Page() {
             </select>
           </div>
 
+          {/* State */}
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Recent Grant Activity (Last 12 Months)
+            <label htmlFor="state" className="mb-2 block text-sm font-semibold text-gray-700">
+              State <span className="text-red-600">*</span>
             </label>
-            <p className="mb-2 text-xs text-gray-500">
-              How many grants have you applied for in the past year?
-            </p>
             <select
-              value={formData.recentGrantActivity}
-              onChange={(e) => setFormData({ ...formData, recentGrantActivity: e.target.value })}
-              className="w-full rounded-md border border-gray-300 p-3"
+              id="state"
+              value={formData.state}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+              required
             >
-              <option value="">Select grant activity</option>
-              {grantActivity.map((activity) => (
-                <option key={activity} value={activity}>
-                  {activity}
+              <option value="">Select state</option>
+              {usStates.map((state) => (
+                <option key={state} value={state}>
+                  {state}
                 </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium">Fiscal Year</label>
-            <p className="mb-2 text-xs text-gray-500">Your organization's fiscal year period</p>
-            <select
-              value={formData.fiscalYear}
-              onChange={(e) => setFormData({ ...formData, fiscalYear: e.target.value })}
-              className="w-full rounded-md border border-gray-300 p-3"
+          <div className="flex justify-between items-center pt-4">
+            <button
+              type="button"
+              onClick={() => router.push('/onboarding/step2')}
+              className="text-sm text-gray-600 hover:text-[#1E6F5C]"
             >
-              <option value="">Select fiscal year</option>
-              {fiscalYearOptions.map((fy) => (
-                <option key={fy} value={fy}>
-                  {fy}
-                </option>
-              ))}
-            </select>
+              ← Back
+            </button>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleSkip}
+                className="text-sm text-gray-600 hover:text-[#1E6F5C] px-4 py-2 rounded-md hover:bg-gray-50"
+              >
+                Skip
+              </button>
+              <Button
+                type="submit"
+                className="bg-[#1E6F5C] text-white font-bold hover:bg-[#1a5d4d] py-3 rounded-md px-6"
+                disabled={isLoading || !formData.mission || !formData.budget || !formData.staffSize || !formData.state}
+              >
+                {isLoading ? 'Saving...' : 'Continue'}
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="flex justify-between">
-          <button
-            onClick={() => router.push('/onboarding/step2')}
-            className="text-gray-600 hover:text-brand"
-          >
-            ← Back
-          </button>
-          <Button onClick={handleContinue}>Continue →</Button>
-        </div>
+        </form>
       </Card>
     </div>
   )

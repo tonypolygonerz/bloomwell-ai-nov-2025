@@ -1,5 +1,6 @@
 interface ProPublicaOrg {
-  ein: string
+  ein: string | number
+  strein?: string
   name: string
   city: string
   state: string
@@ -14,11 +15,8 @@ interface ProPublicaResponse {
 }
 
 export async function searchProPublicaOrg(ein: string): Promise<ProPublicaOrg | null> {
-  const apiKey = process.env.PROPUBLICA_API_KEY
-  if (!apiKey) {
-    return null
-  }
-
+  // ProPublica API is public and doesn't require an API key
+  // API key check removed to allow public access
   try {
     const response = await fetch(
       `https://projects.propublica.org/nonprofits/api/v2/organizations/${ein}.json`,
@@ -41,11 +39,8 @@ export async function searchProPublicaOrg(ein: string): Promise<ProPublicaOrg | 
 }
 
 export async function searchProPublicaByName(query: string): Promise<ProPublicaOrg[]> {
-  const apiKey = process.env.PROPUBLICA_API_KEY
-  if (!apiKey) {
-    return []
-  }
-
+  // ProPublica API is public and doesn't require an API key
+  // API key check removed to allow public access
   try {
     const response = await fetch(
       `https://projects.propublica.org/nonprofits/api/v2/search.json?q=${encodeURIComponent(query)}`,

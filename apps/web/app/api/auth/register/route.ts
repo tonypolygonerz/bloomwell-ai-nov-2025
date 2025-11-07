@@ -6,7 +6,7 @@ import { z } from 'zod'
 const RegisterSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 })
     }
 
-    const hashedPassword = await hash(password, 12)
+    const hashedPassword = password ? await hash(password, 12) : null
 
     await prisma.user.create({
       data: {

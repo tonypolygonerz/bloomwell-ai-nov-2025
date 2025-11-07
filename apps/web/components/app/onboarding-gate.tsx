@@ -25,8 +25,19 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         const data = await response.json()
 
         setIsComplete(data.isComplete)
-        // Show banner if incomplete (but don't block access)
-        setShowBanner(!data.isComplete)
+        
+        // Redirect to Step 1 if basic completion is missing (user hasn't selected organization type)
+        if (!data.isBasicComplete && typeof window !== 'undefined') {
+          const currentPath = window.location.pathname
+          // Only redirect if on /app routes, not if already on onboarding
+          if (currentPath.startsWith('/app') && !currentPath.startsWith('/app/onboarding')) {
+            router.push('/onboarding/step2')
+            return
+          }
+        }
+        
+        // Show banner if basic complete but not full complete (don't block access)
+        setShowBanner(data.isBasicComplete && !data.isFullComplete)
       } catch (error) {
         console.error('Failed to check onboarding status:', error)
         setIsComplete(false)
@@ -51,11 +62,11 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-3">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
             <p className="text-sm text-yellow-800">
-              Complete your profile to get personalized grant recommendations
+              Complete your profile to unlock personalized grant recommendations
             </p>
             <div className="flex gap-2">
               <Link
-                href="/onboarding/step1"
+                href="/onboarding/step2"
                 className="rounded-md bg-yellow-600 px-3 py-1 text-sm font-medium text-white hover:bg-yellow-700"
               >
                 Complete Profile
@@ -64,7 +75,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
                 onClick={() => setShowBanner(false)}
                 className="text-sm text-yellow-700 hover:text-yellow-900"
               >
-                Skip for now
+                Dismiss
               </button>
             </div>
           </div>

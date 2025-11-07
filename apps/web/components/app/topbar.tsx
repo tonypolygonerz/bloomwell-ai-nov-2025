@@ -3,7 +3,6 @@
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button } from '@bloomwell/ui'
 
 export function AppTopbar() {
   const { data: session } = useSession()
@@ -51,9 +50,9 @@ export function AppTopbar() {
             🕐 {daysRemaining} days remaining in your free trial
           </span>
           <Link href="/upgrade">
-            <Button size="sm" className="bg-white text-brand hover:bg-gray-100">
+            <button className="inline-flex items-center justify-center rounded-md bg-white text-brand hover:bg-gray-100 px-3 py-1.5 text-sm font-medium transition-colors">
               Upgrade to continue accessing all features
-            </Button>
+            </button>
           </Link>
         </div>
       )}

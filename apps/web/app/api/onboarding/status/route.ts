@@ -19,14 +19,22 @@ export async function GET() {
     where: { userId },
   })
 
-  // Consider onboarding complete if organization exists with:
-  // - Mission (Step 2: What You Do - critical for grant matching)
-  // - At least one capacity field (budget, revenue, or staff size from Step 3)
+  // Basic completion: organizationType exists (Step 1 done)
+  const isBasicComplete = !!organization?.organizationType
+
+  // Full completion: mission + at least one capacity field (for grant matching)
   const hasMission = !!organization?.mission
   const hasCapacityInfo =
     !!organization?.budget || !!organization?.revenueBracket || !!organization?.staffSize
+  const isFullComplete = hasMission && hasCapacityInfo
 
-  const isComplete = hasMission && hasCapacityInfo
+  // Backward compatibility: isComplete = isFullComplete
+  const isComplete = isFullComplete
 
-  return NextResponse.json({ isComplete, organization })
+  return NextResponse.json({ 
+    isComplete, 
+    isBasicComplete, 
+    isFullComplete, 
+    organization 
+  })
 }

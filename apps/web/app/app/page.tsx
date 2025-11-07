@@ -1,15 +1,44 @@
 'use client'
 
-import { useState } from 'react'
-import { Input } from '@bloomwell/ui'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Input, Button } from '@bloomwell/ui'
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>(
     [],
   )
   const [isLoading, setIsLoading] = useState(false)
   const [enableWebSearch, setEnableWebSearch] = useState(false)
+  const [showProfileBanner, setShowProfileBanner] = useState(false)
+  const [onboardingStatus, setOnboardingStatus] = useState<{
+    isBasicComplete: boolean
+    isFullComplete: boolean
+  } | null>(null)
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        const response = await fetch('/api/onboarding/status')
+        const data = await response.json()
+        setOnboardingStatus({
+          isBasicComplete: data.isBasicComplete || false,
+          isFullComplete: data.isFullComplete || false,
+        })
+        // Show banner if basic complete but not full complete
+        setShowProfileBanner(data.isBasicComplete && !data.isFullComplete)
+      } catch (error) {
+        console.error('Failed to check onboarding status:', error)
+      }
+    }
+    checkOnboardingStatus()
+  }, [])
+
+  const handleCompleteProfile = () => {
+    router.push('/onboarding/step2')
+  }
 
   const quickActions = [
     { text: 'Help me find a federal grant', prompt: 'Find federal grants for my nonprofit' },
@@ -56,6 +85,26 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-full flex-col">
+      {showProfileBanner && (
+        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-200 px-8 py-4">
+          <div className="mx-auto max-w-3xl flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-emerald-900 mb-1">
+                Complete your profile to unlock grant matching
+              </h3>
+              <p className="text-xs text-emerald-700">
+                Add your mission and capacity details to get personalized grant recommendations tailored to your organization.
+              </p>
+            </div>
+            <Button
+              onClick={handleCompleteProfile}
+              className="ml-4 bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Complete Profile →
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="flex-1 overflow-y-auto p-8">
         {messages.length === 0 ? (
           <div className="mx-auto max-w-3xl">

@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import { generateChatResponse } from '@bloomwell/ai'
 import prisma from '@bloomwell/db'
-
-const DAILY_TOKEN_LIMIT = 10000
+import { checkTokenLimit } from '@/lib/subscription-middleware'
+import { trackTokenUsage, getUsageStats } from '@/lib/usage-tracker'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -31,15 +31,22 @@ export async function POST(request: NextRequest) {
       where: { userId },
     })
 
-    // Check token usage (simplified - in production, track actual tokens)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Calculate approximate tokens for the request (rough estimate: 4 chars per token)
+    const estimatedRequestTokens = Math.ceil(message.length / 4)
 
-    // Calculate approximate tokens (rough estimate: 4 chars per token)
-    const estimatedTokens = message.length / 4
-
-    // Note: In production, implement proper token tracking in database
-    // For now, we'll proceed with the request
+    // Check token limits before processing
+    const tokenCheck = await checkTokenLimit(userId, estimatedRequestTokens)
+    if (!tokenCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: tokenCheck.reason || 'Token limit exceeded',
+          tokensRemaining: tokenCheck.tokensRemaining,
+          tokensUsedToday: tokenCheck.tokensUsedToday,
+          dailyLimit: tokenCheck.dailyLimit,
+        },
+        { status: 429 },
+      )
+    }
 
     const messages = [...history, { role: 'user' as const, content: message }]
 
@@ -57,20 +64,33 @@ export async function POST(request: NextRequest) {
       context,
     })
 
+    // Calculate actual tokens used (request + response estimate)
+    // Response tokens are typically longer, estimate 2x for response
+    const estimatedResponseTokens = Math.ceil(response.message.content.length / 4)
+    const totalTokensUsed = estimatedRequestTokens + estimatedResponseTokens
+
+    // Track token usage
+    await trackTokenUsage(userId, totalTokensUsed)
+
     // Save chat to database if chatId provided
     if (chatId) {
       await prisma.chat.update({
         where: { id: chatId },
         data: {
           messages: [...messages, response.message] as never,
-          tokenUsed: { increment: Math.floor(estimatedTokens * 2) },
+          tokenUsed: { increment: totalTokensUsed },
         },
       })
     }
 
+    // Get updated usage stats
+    const usageStats = await getUsageStats(userId)
+
     return NextResponse.json({
       response: response.message.content,
-      tokensRemaining: DAILY_TOKEN_LIMIT - estimatedTokens * 2, // Rough estimate
+      tokensRemaining: usageStats.tokensRemainingToday,
+      tokensUsedToday: usageStats.tokensUsedToday,
+      dailyLimit: usageStats.tokensDailyLimit,
       grantRecommendations: response.grantRecommendations,
     })
   } catch (error) {

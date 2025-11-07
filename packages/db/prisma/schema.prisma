@@ -23,12 +23,25 @@ model User {
   accounts       Account[]
   sessions       Session[]
   profileMetadata Json?
+  
+  // Stripe subscription fields
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  subscriptionStatus   String?  // active, canceled, trialing, past_due, incomplete
+  currentPriceId       String?
+  
+  // Usage tracking
+  documentsUsedToday   Int      @default(0)
+  documentsUsedMonth   Int      @default(0)
+  tokensUsedToday      Int      @default(0)
+  lastUsageReset       DateTime?
 }
 
 model Organization {
   id             String  @id @default(cuid())
   user           User    @relation(fields: [userId], references: [id])
   userId         String  @unique
+  organizationType String?
   ein            String?
   legalName      String?
   mission        String?
@@ -38,6 +51,7 @@ model Organization {
   revenueBracket String?
   serviceGeo     String?
   fiscalYear     String?
+  isVerified     Boolean @default(false)
 }
 
 model Chat {

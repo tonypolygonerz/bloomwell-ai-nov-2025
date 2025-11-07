@@ -36,6 +36,18 @@ export async function getGrantRecommendations(
     throw new Error(`Organization with id ${organizationId} not found`)
   }
 
+  // Check for full profile completion (required for grant matching)
+  const hasMission = !!organization.mission
+  const hasCapacityInfo =
+    !!organization.budget || !!organization.revenueBracket || !!organization.staffSize
+  const isFullComplete = hasMission && hasCapacityInfo
+
+  if (!isFullComplete) {
+    // Return empty array if profile is not fully complete
+    // Caller should check profile completion before calling this function
+    return []
+  }
+
   // Calculate date thresholds based on urgency
   const today = new Date()
   today.setHours(0, 0, 0, 0)

@@ -12,8 +12,26 @@ interface GrantSearchPromptProps {
 export function GrantSearchPrompt({ isOpen, onClose, onComplete }: GrantSearchPromptProps) {
   const router = useRouter()
 
-  const handleComplete = () => {
-    router.push('/onboarding/step1')
+  const handleComplete = async () => {
+    // Check current onboarding status to route to appropriate step
+    try {
+      const response = await fetch('/api/onboarding/status')
+      const data = await response.json()
+      
+      if (!data.isBasicComplete) {
+        // No organization type - go to Step 1
+        router.push('/onboarding/step2')
+      } else if (!data.isFullComplete) {
+        // Has org type but missing mission/capacity - go to Step 2
+        router.push('/onboarding/step2')
+      } else {
+        // Profile complete - shouldn't reach here
+        onClose()
+      }
+    } catch (error) {
+      // Fallback to Step 1 if check fails
+      router.push('/onboarding/step2')
+    }
     onComplete()
   }
 
@@ -23,7 +41,10 @@ export function GrantSearchPrompt({ isOpen, onClose, onComplete }: GrantSearchPr
         <h2 className="mb-2 text-xl font-bold">Complete Your Profile First</h2>
         <p className="mb-4 text-sm text-gray-600">
           To get accurate and personalized grant recommendations, we need to know more about your
-          organization. This takes just 2-3 minutes.
+          organization. Complete your profile to unlock grant matching features.
+        </p>
+        <p className="mb-4 text-xs text-gray-500">
+          You can still use general AI assistance while you complete your profile.
         </p>
         <div className="flex gap-3">
           <Button onClick={handleComplete} className="flex-1">
