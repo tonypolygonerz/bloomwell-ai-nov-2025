@@ -18,7 +18,10 @@ export const Dialog: React.FC<DialogProps> = ({ open, onClose, children, classNa
       onClick={onClose}
     >
       <div
-        className={cn('w-full max-w-lg rounded-md bg-white p-4 shadow-lg', className)}
+        className={cn(
+          'w-full rounded-md bg-white p-4 shadow-lg',
+          className ? className : 'max-w-lg',
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

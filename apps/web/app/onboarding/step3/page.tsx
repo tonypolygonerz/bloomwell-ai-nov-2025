@@ -79,6 +79,24 @@ export default function Step3Page() {
     state: '',
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Enhanced error logging helper
+  const logError = (context: string, error: any) => {
+    if (error instanceof Error) {
+      console.error(`${context}:`, {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+      })
+    } else {
+      console.error(`${context}:`, {
+        errorObject: error,
+        stringified: JSON.stringify(error, null, 2),
+      })
+    }
+  }
 
   const handleContinue = async () => {
     if (!formData.mission || !formData.budget || !formData.staffSize || !formData.state) {
@@ -86,8 +104,10 @@ export default function Step3Page() {
     }
 
     setIsLoading(true)
+    setErrorMessage(null)
+
     try {
-      await fetch('/api/onboarding/save', {
+      const response = await fetch('/api/onboarding/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,18 +119,31 @@ export default function Step3Page() {
         }),
       })
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        logError('Failed to save organization data', errorData)
+        
+        const errorMsg = errorData.message || errorData.error || 'Unable to save your data. Please try again.'
+        setErrorMessage(errorMsg)
+        setIsLoading(false)
+        return
+      }
+
+      // Success - navigate to dashboard
       router.push('/app')
     } catch (error) {
-      console.error('Error saving data:', error)
-    } finally {
+      logError('Error saving organization data', error)
+      setErrorMessage('An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
   }
 
   const handleSkip = async () => {
     setIsLoading(true)
+    setErrorMessage(null)
+
     try {
-      await fetch('/api/onboarding/save', {
+      const response = await fetch('/api/onboarding/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,9 +155,25 @@ export default function Step3Page() {
         }),
       })
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        logError('Failed to save organization data (skip)', errorData)
+        
+        // For skip, we still navigate but show a warning
+        const errorMsg = errorData.message || errorData.error || 'Unable to save your data, but continuing...'
+        console.warn('Skip save failed:', errorMsg)
+        // Still navigate on skip even if save fails
+        router.push('/app')
+        return
+      }
+
+      // Success - navigate to dashboard
       router.push('/app')
     } catch (error) {
-      console.error('Error saving data:', error)
+      logError('Error saving organization data (skip)', error)
+      // For skip, navigate anyway but log the error
+      console.warn('Skip encountered error, but continuing:', error)
+      router.push('/app')
     } finally {
       setIsLoading(false)
     }
@@ -136,6 +185,13 @@ export default function Step3Page() {
         <ProgressIndicator currentStep={3} totalSteps={3} />
 
         <form onSubmit={(e) => { e.preventDefault(); handleContinue(); }} className="space-y-5">
+          {/* Error Message Display */}
+          {errorMessage && (
+            <div className="rounded-md bg-red-50 border border-red-200 p-4">
+              <p className="text-sm text-red-800">{errorMessage}</p>
+            </div>
+          )}
+
           {/* Mission Statement */}
           <div>
             <label htmlFor="mission" className="mb-2 block text-sm font-semibold text-gray-700">

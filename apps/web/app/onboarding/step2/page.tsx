@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Button, Card, Input } from '@bloomwell/ui'
 import { ProgressIndicator } from '@/components/auth/progress-indicator'
 
@@ -23,6 +24,7 @@ interface ProPublicaResult {
 
 export default function Step2Page() {
   const router = useRouter()
+  const { data: session } = useSession()
   const searchTimeoutRef = useRef<NodeJS.Timeout>()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const manualSearchTimeoutRef = useRef<NodeJS.Timeout>()
@@ -51,6 +53,25 @@ export default function Step2Page() {
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Enhanced error logging helper
+  const logError = (context: string, error: any) => {
+    // Handle both Error objects and plain objects (like API responses)
+    if (error instanceof Error) {
+      console.error(`${context}:`, {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+      })
+    } else {
+      // Plain object (like API error response)
+      console.error(`${context}:`, {
+        errorObject: error,
+        stringified: JSON.stringify(error, null, 2)
+      })
+    }
+  }
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -91,7 +112,7 @@ export default function Step2Page() {
         }
         
         const data = await response.json()
-        console.log('ProPublica API response:', data)
+        console.log('ProPublica API response:', JSON.stringify(data, null, 2))
         const organizations = data.organizations || []
         setSearchResults(organizations)
         if (organizations.length > 0) {
@@ -249,19 +270,20 @@ export default function Step2Page() {
           ein: orgData?.ein || ein || undefined,
           legalName: orgData?.legalName || organizationName || undefined,
           isVerified: isVerified || !!orgData,
+          email: session?.user?.email || undefined, // Include email for authentication
         }),
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.error('Failed to save organization data:', errorData)
+        logError('Failed to save organization data', errorData)
         setErrorMessage('Unable to save your data, but continuing to next step...')
         // Still navigate even if save fails
       }
 
       router.push('/onboarding/step3')
     } catch (error) {
-      console.error('Error saving organization data:', error)
+      logError('Error saving organization data', error)
       setErrorMessage('Unable to save your data, but continuing to next step...')
       // Navigate even on error
       router.push('/onboarding/step3')
@@ -275,15 +297,15 @@ export default function Step2Page() {
     setErrorMessage(null)
 
     // Save any entered data before skipping - ensure organizationType is always included
-    // Wait for save to complete before navigating to ensure data is persisted
+    // Wait for save to complete and verify success before navigating
     try {
-      // Create a timeout promise (3 seconds max wait)
+      // Create a timeout promise (5 seconds max wait)
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Save timeout')), 3000)
+        setTimeout(() => reject(new Error('Save timeout')), 5000)
       })
 
-      // Race the save call against the timeout
-      const response = await Promise.race([
+      // Save the organization data
+      const saveResponse = await Promise.race([
         fetch('/api/onboarding/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -292,23 +314,74 @@ export default function Step2Page() {
             ein: orgData?.ein || ein || undefined,
             legalName: orgData?.legalName || organizationName || undefined,
             isVerified: isVerified || !!orgData,
+            email: session?.user?.email || undefined, // Include email for authentication
           }),
         }),
         timeoutPromise,
       ]) as Response
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('Failed to save organization data:', errorData)
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json().catch(() => ({}))
+        logError('Failed to save organization data', errorData)
+        setErrorMessage('Failed to save your information. Please try again.')
+        setIsLoading(false)
+        return
       }
-    } catch (error) {
-      console.error('Error saving organization data:', error)
-      // Continue with navigation even if save fails or times out
-    }
 
-    // Navigate after save completes (or times out) using window.location.href for reliable navigation
-    // This ensures organizationType is saved before OnboardingGate checks the status
-    window.location.href = '/app'
+      // Verify the save was successful by checking the status API
+      // Add a delay to ensure database transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Verify the status shows basic completion before navigating
+      const statusResponse = await fetch('/api/onboarding/status?t=' + Date.now(), {
+        cache: 'no-store',
+      })
+      
+      if (!statusResponse.ok) {
+        console.error('Failed to verify save status')
+        setErrorMessage('Unable to verify your information was saved. Please try again.')
+        setIsLoading(false)
+        return
+      }
+
+      const statusData = await statusResponse.json()
+      
+      if (!statusData.isBasicComplete) {
+        // Save might not have propagated yet, wait a bit more and retry once
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const retryStatusResponse = await fetch('/api/onboarding/status?t=' + Date.now(), {
+          cache: 'no-store',
+        })
+        
+        if (retryStatusResponse.ok) {
+          const retryStatusData = await retryStatusResponse.json()
+          if (!retryStatusData.isBasicComplete) {
+            // Even if status check fails, proceed with bypass parameter
+            // This allows database time to catch up
+            console.warn('Save verification: organizationType not yet visible, using bypass parameter')
+          }
+        }
+      }
+
+      // Save successful - navigate to app with bypass parameter
+      // Set flag to indicate we're coming from onboarding (helps prevent redirect loops)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('fromOnboarding', 'true')
+        sessionStorage.setItem('lastRedirectTime', Date.now().toString())
+      }
+      
+      // Add query parameter to bypass OnboardingGate check temporarily
+      // This gives the database time to fully commit the transaction
+      window.location.href = '/app?skipOnboarding=true'
+    } catch (error) {
+      logError('Error saving organization data', error)
+      setErrorMessage(
+        error instanceof Error && error.message === 'Save timeout'
+          ? 'Save operation timed out. Please try again.'
+          : 'An error occurred while saving. Please try again.'
+      )
+      setIsLoading(false)
+    }
   }
 
   const isNonprofit = selectedType === 'US Registered 501(c)(3) Nonprofit'

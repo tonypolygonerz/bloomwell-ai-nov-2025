@@ -64,7 +64,9 @@ model Chat {
   messages  Json[]
   tokenUsed Int      @default(0)
   sharedId  String?  @unique
+  isPinned  Boolean  @default(false)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Project {
@@ -72,9 +74,11 @@ model Project {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   name      String
+  color     String?
   files     File[]
   chats     Chat[]
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   linkedGrantId       String?
   applicationStatus   ProjectStatus? @default(DRAFT)
   requestedAmount     Int?
