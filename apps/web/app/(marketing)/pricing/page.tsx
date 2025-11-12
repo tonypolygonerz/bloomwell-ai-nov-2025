@@ -17,7 +17,7 @@ const STRIPE_PRICES = {
 
 export default function PricingPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null)
   const [starterBillingCycle, setStarterBillingCycle] = useState<'monthly' | 'annual'>('monthly')
   const [enterpriseBillingCycle, setEnterpriseBillingCycle] = useState<'monthly' | 'annual'>('monthly')

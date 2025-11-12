@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@bloomwell/stripe'
-import { getTierFromPriceId } from '@bloomwell/stripe'
 import prisma from '@bloomwell/db'
 import Stripe from 'stripe'
 
@@ -84,7 +83,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return
   }
 
-  const tier = getTierFromPriceId(priceId)
   const userId = session.metadata?.userId
 
   // Update user subscription

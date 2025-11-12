@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card } from '@bloomwell/ui'
 import Link from 'next/link'
 
-interface SubscriptionStatusProps {
-  userId?: string
-}
+// Note: userId prop interface removed as it's not currently used
 
 interface UsageStats {
   documentsUsedToday: number
@@ -28,7 +26,7 @@ interface SubscriptionData {
   isTrialActive: boolean
 }
 
-export function SubscriptionStatus({ userId }: SubscriptionStatusProps) {
+export function SubscriptionStatus() {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null)
   const [usageStats, setUsageStats] = useState<UsageStats | null>(null)
   const [loading, setLoading] = useState(true)

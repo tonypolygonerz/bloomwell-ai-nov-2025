@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import { stripe, createCustomer } from '@bloomwell/stripe'
-import { STRIPE_PRICES, isValidPriceId } from '@bloomwell/stripe'
+import { isValidPriceId } from '@bloomwell/stripe'
 import prisma from '@bloomwell/db'
 
 export async function POST(request: NextRequest) {

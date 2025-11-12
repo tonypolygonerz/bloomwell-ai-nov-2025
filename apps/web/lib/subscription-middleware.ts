@@ -16,6 +16,134 @@ export async function checkSubscriptionAccess(userId: string): Promise<{
   return { hasAccess: true }
 }
 
+// Helper: Get user document usage after reset
+async function getUserDocumentUsage(userId: string): Promise<{
+  documentsUsedToday: number
+  documentsUsedMonth: number
+} | null> {
+  await resetDailyUsageIfNeeded(userId)
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      documentsUsedToday: true,
+      documentsUsedMonth: true,
+    },
+  })
+  if (!user) {
+    return null
+  }
+  return {
+    documentsUsedToday: user.documentsUsedToday || 0,
+    documentsUsedMonth: user.documentsUsedMonth || 0,
+  }
+}
+
+// Helper: Check document limits
+function checkDocumentLimits(
+  documentsUsedToday: number,
+  documentsUsedMonth: number,
+  dailyLimit: number,
+  monthlyLimit: number,
+): { allowed: boolean; reason?: string } {
+  if (documentsUsedToday >= dailyLimit) {
+    return {
+      allowed: false,
+      reason: 'Daily document limit reached',
+    }
+  }
+  if (documentsUsedMonth >= monthlyLimit) {
+    return {
+      allowed: false,
+      reason: 'Monthly document limit reached',
+    }
+  }
+  return { allowed: true }
+}
+
+// Helper: Get document limits from subscription
+function getDocumentLimits(subscription: any): { dailyLimit: number; monthlyLimit: number } {
+  return {
+    dailyLimit: subscription.features?.documents_daily || 0,
+    monthlyLimit: subscription.features?.documents_monthly || 0,
+  }
+}
+
+// Helper: Create error response for document limit check
+function createDocumentLimitError(
+  reason: string,
+  dailyLimit: number = 0,
+  monthlyLimit: number = 0,
+): {
+  allowed: false
+  reason: string
+  documentsUsedToday: number
+  documentsUsedMonth: number
+  dailyLimit: number
+  monthlyLimit: number
+} {
+  return {
+    allowed: false,
+    reason,
+    documentsUsedToday: 0,
+    documentsUsedMonth: 0,
+    dailyLimit,
+    monthlyLimit,
+  }
+}
+
+// Helper: Validate user exists for document check
+async function validateUserForDocumentCheck(userId: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  })
+  return !!user
+}
+
+// Helper: Process document limit check with usage
+async function processDocumentLimitCheck(
+  userId: string,
+  dailyLimit: number,
+  monthlyLimit: number,
+): Promise<{
+  allowed: boolean
+  reason?: string
+  documentsUsedToday: number
+  documentsUsedMonth: number
+  dailyLimit: number
+  monthlyLimit: number
+}> {
+  const usage = await getUserDocumentUsage(userId)
+  if (!usage) {
+    return createDocumentLimitError('User not found', dailyLimit, monthlyLimit)
+  }
+
+  const limitCheck = checkDocumentLimits(
+    usage.documentsUsedToday,
+    usage.documentsUsedMonth,
+    dailyLimit,
+    monthlyLimit,
+  )
+
+  if (!limitCheck.allowed) {
+    return {
+      ...limitCheck,
+      documentsUsedToday: usage.documentsUsedToday,
+      documentsUsedMonth: usage.documentsUsedMonth,
+      dailyLimit,
+      monthlyLimit,
+    }
+  }
+
+  return {
+    allowed: true,
+    documentsUsedToday: usage.documentsUsedToday,
+    documentsUsedMonth: usage.documentsUsedMonth,
+    dailyLimit,
+    monthlyLimit,
+  }
+}
+
 // Check document upload limits
 export async function checkDocumentLimit(userId: string): Promise<{
   allowed: boolean
@@ -26,88 +154,112 @@ export async function checkDocumentLimit(userId: string): Promise<{
   monthlyLimit: number
 }> {
   const subscription = await getUserSubscription(userId)
-  
-  // Check if user has access
   const accessCheck = await checkSubscriptionAccess(userId)
   if (!accessCheck.hasAccess) {
     return {
-      allowed: false,
-      ...(accessCheck.reason ? { reason: accessCheck.reason } : {}),
-      documentsUsedToday: 0,
-      documentsUsedMonth: 0,
-      dailyLimit: 0,
-      monthlyLimit: 0,
+      ...createDocumentLimitError(accessCheck.reason || 'No access'),
     }
   }
 
-  // Get user's current usage
+  if (!(await validateUserForDocumentCheck(userId))) {
+    return createDocumentLimitError('User not found')
+  }
+
+  const { dailyLimit, monthlyLimit } = getDocumentLimits(subscription)
+  return processDocumentLimitCheck(userId, dailyLimit, monthlyLimit)
+}
+
+// Helper: Get user token usage after reset
+async function getUserTokenUsage(userId: string): Promise<number | null> {
+  await resetDailyUsageIfNeeded(userId)
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      documentsUsedToday: true,
-      documentsUsedMonth: true,
+      tokensUsedToday: true,
     },
   })
-
   if (!user) {
+    return null
+  }
+  return user.tokensUsedToday || 0
+}
+
+// Helper: Check token limits
+function checkTokenLimits(
+  tokensUsedToday: number,
+  requestedTokens: number,
+  dailyLimit: number,
+): { allowed: boolean; reason?: string; tokensRemaining: number } {
+  const tokensRemaining = dailyLimit - tokensUsedToday
+  if (tokensUsedToday + requestedTokens > dailyLimit) {
     return {
       allowed: false,
-      reason: 'User not found',
-      documentsUsedToday: 0,
-      documentsUsedMonth: 0,
-      dailyLimit: 0,
-      monthlyLimit: 0,
+      reason: 'Daily token limit exceeded',
+      tokensRemaining,
     }
   }
+  return {
+    allowed: true,
+    tokensRemaining: tokensRemaining - requestedTokens,
+  }
+}
 
-  // Reset daily usage if needed
-  await resetDailyUsageIfNeeded(userId)
+// Helper: Get token limit from subscription
+function getTokenLimit(subscription: any): number {
+  return subscription.features?.tokens_daily || 0
+}
 
-  // Get limits from subscription features
-  const dailyLimit = subscription.features?.documents_daily || 0
-  const monthlyLimit = subscription.features?.documents_monthly || 0
+// Helper: Create error response for token limit check
+function createTokenLimitError(
+  reason: string,
+  dailyLimit: number = 0,
+): {
+  allowed: false
+  reason: string
+  tokensUsedToday: number
+  dailyLimit: number
+  tokensRemaining: number
+} {
+  return {
+    allowed: false,
+    reason,
+    tokensUsedToday: 0,
+    dailyLimit,
+    tokensRemaining: 0,
+  }
+}
 
-  // Re-fetch user after potential reset
-  const updatedUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      documentsUsedToday: true,
-      documentsUsedMonth: true,
-    },
-  })
-
-  const documentsUsedToday = updatedUser?.documentsUsedToday || 0
-  const documentsUsedMonth = updatedUser?.documentsUsedMonth || 0
-
-  // Check limits
-  if (documentsUsedToday >= dailyLimit) {
-    return {
-      allowed: false,
-      reason: 'Daily document limit reached',
-      documentsUsedToday,
-      documentsUsedMonth,
-      dailyLimit,
-      monthlyLimit,
-    }
+// Helper: Process token limit check with usage
+async function processTokenLimitCheck(
+  userId: string,
+  requestedTokens: number,
+  dailyLimit: number,
+): Promise<{
+  allowed: boolean
+  reason?: string
+  tokensUsedToday: number
+  dailyLimit: number
+  tokensRemaining: number
+}> {
+  const tokensUsedToday = await getUserTokenUsage(userId)
+  if (tokensUsedToday === null) {
+    return createTokenLimitError('User not found', dailyLimit)
   }
 
-  if (documentsUsedMonth >= monthlyLimit) {
+  const limitCheck = checkTokenLimits(tokensUsedToday, requestedTokens, dailyLimit)
+  if (!limitCheck.allowed) {
     return {
-      allowed: false,
-      reason: 'Monthly document limit reached',
-      documentsUsedToday,
-      documentsUsedMonth,
+      ...limitCheck,
+      tokensUsedToday,
       dailyLimit,
-      monthlyLimit,
     }
   }
 
   return {
     allowed: true,
-    documentsUsedToday,
-    documentsUsedMonth,
+    tokensUsedToday,
     dailyLimit,
-    monthlyLimit,
+    tokensRemaining: limitCheck.tokensRemaining,
   }
 }
 
@@ -123,71 +275,24 @@ export async function checkTokenLimit(
   tokensRemaining: number
 }> {
   const subscription = await getUserSubscription(userId)
-  
-  // Check if user has access
   const accessCheck = await checkSubscriptionAccess(userId)
   if (!accessCheck.hasAccess) {
     return {
-      allowed: false,
-      ...(accessCheck.reason ? { reason: accessCheck.reason } : {}),
-      tokensUsedToday: 0,
-      dailyLimit: 0,
-      tokensRemaining: 0,
+      ...createTokenLimitError(accessCheck.reason || 'No access'),
     }
   }
 
-  // Get user's current usage
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: {
-      tokensUsedToday: true,
-    },
+    select: { id: true },
   })
 
   if (!user) {
-    return {
-      allowed: false,
-      reason: 'User not found',
-      tokensUsedToday: 0,
-      dailyLimit: 0,
-      tokensRemaining: 0,
-    }
+    return createTokenLimitError('User not found')
   }
 
-  // Reset daily usage if needed
-  await resetDailyUsageIfNeeded(userId)
-
-  // Get limits from subscription features
-  const dailyLimit = subscription.features?.tokens_daily || 0
-
-  // Re-fetch user after potential reset
-  const updatedUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      tokensUsedToday: true,
-    },
-  })
-
-  const tokensUsedToday = updatedUser?.tokensUsedToday || 0
-  const tokensRemaining = dailyLimit - tokensUsedToday
-
-  // Check if request would exceed limit
-  if (tokensUsedToday + requestedTokens > dailyLimit) {
-    return {
-      allowed: false,
-      reason: 'Daily token limit exceeded',
-      tokensUsedToday,
-      dailyLimit,
-      tokensRemaining,
-    }
-  }
-
-  return {
-    allowed: true,
-    tokensUsedToday,
-    dailyLimit,
-    tokensRemaining: tokensRemaining - requestedTokens,
-  }
+  const dailyLimit = getTokenLimit(subscription)
+  return processTokenLimitCheck(userId, requestedTokens, dailyLimit)
 }
 
 // Increment usage counters
@@ -247,6 +352,7 @@ async function resetDailyUsageIfNeeded(userId: string): Promise<void> {
     })
   }
 }
+
 
 
 

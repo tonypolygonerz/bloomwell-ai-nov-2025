@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import prisma from '@bloomwell/db'
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   const session = await getServerSession(authOptions)
 
   if (!session) {

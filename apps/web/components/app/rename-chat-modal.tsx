@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react'
 import { Dialog, Button } from '@bloomwell/ui'
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+type RenameChatFn = (chatId: string, newTitle: string) => Promise<void>
+
 interface RenameChatModalProps {
   isOpen: boolean
   onClose: () => void
   currentTitle: string
   chatId: string
-  onRename: (chatId: string, newTitle: string) => Promise<void>
+  onRename: RenameChatFn
 }
 
 export function RenameChatModal({

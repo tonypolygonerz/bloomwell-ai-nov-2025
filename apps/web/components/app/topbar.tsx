@@ -8,12 +8,6 @@ export function AppTopbar() {
   const { data: session } = useSession()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
-  const trialEndsAt = session?.trialEndsAt ?? session?.user?.trialEndsAt
-  const isTrialActive = trialEndsAt && new Date(trialEndsAt) > new Date()
-  const daysRemaining = isTrialActive
-    ? Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : 0
-
   return (
     <header className="bg-brand text-white">
       <div className="mx-auto flex max-w-full items-center justify-between px-4 py-3">

@@ -12,9 +12,9 @@
  * Usage: npx tsx apps/web/scripts/test-propublica-api.ts
  */
 
-const PROPUBLICA_SEARCH_URL = 'https://projects.propublica.org/nonprofits/api/v2/search.json'
-const NEXTJS_API_URL = 'http://localhost:3000/api/onboarding/propublica'
-const TEST_QUERY = 'VIETNAMESE PHAP TANG'
+const propublicaSearchUrl = 'https://projects.propublica.org/nonprofits/api/v2/search.json'
+const nextjsApiUrl = 'http://localhost:3000/api/onboarding/propublica'
+const testQuery = 'VIETNAMESE PHAP TANG'
 
 interface ProPublicaOrg {
   ein: number | string
@@ -38,15 +38,42 @@ interface ProPublicaResponse {
 }
 
 /**
+ * Display ProPublica API results
+ */
+function displayProPublicaResults(data: ProPublicaResponse): void {
+  console.log(`✅ Success! Found ${data.total_results} results`)
+  console.log(`API Version: ${data.api_version}`)
+  console.log(`Pages: ${data.num_pages}, Current Page: ${data.cur_page}`)
+  
+  if (data.organizations && data.organizations.length > 0) {
+    console.log(`\n📋 First ${Math.min(3, data.organizations.length)} results:`)
+    data.organizations.slice(0, 3).forEach((org, idx) => {
+      console.log(`\n${idx + 1}. ${org.name}`)
+      console.log(`   EIN (numeric): ${org.ein}`)
+      console.log(`   STREIN (formatted): ${org.strein || 'NOT PROVIDED'}`)
+      console.log(`   Location: ${org.city}, ${org.state}`)
+      console.log(`   NTEE Code: ${org.ntee_code || 'N/A'}`)
+      
+      // Verify field mapping
+      if (!org.strein && typeof org.ein === 'number') {
+        console.log(`   ⚠️  WARNING: strein field missing, will need to format ein`)
+      }
+    })
+  } else {
+    console.log('⚠️  No organizations found')
+  }
+}
+
+/**
  * Test direct ProPublica API call
  */
 async function testDirectProPublicaAPI(query: string): Promise<void> {
   console.log('\n🔍 Testing Direct ProPublica API...')
   console.log(`Query: "${query}"`)
-  console.log(`URL: ${PROPUBLICA_SEARCH_URL}?q=${encodeURIComponent(query)}`)
+  console.log(`URL: ${propublicaSearchUrl}?q=${encodeURIComponent(query)}`)
   
   try {
-    const url = `${PROPUBLICA_SEARCH_URL}?q=${encodeURIComponent(query)}`
+    const url = `${propublicaSearchUrl}?q=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Bloomwell-AI-Test/1.0',
@@ -62,28 +89,7 @@ async function testDirectProPublicaAPI(query: string): Promise<void> {
     }
 
     const data = (await response.json()) as ProPublicaResponse
-    
-    console.log(`✅ Success! Found ${data.total_results} results`)
-    console.log(`API Version: ${data.api_version}`)
-    console.log(`Pages: ${data.num_pages}, Current Page: ${data.cur_page}`)
-    
-    if (data.organizations && data.organizations.length > 0) {
-      console.log(`\n📋 First ${Math.min(3, data.organizations.length)} results:`)
-      data.organizations.slice(0, 3).forEach((org, idx) => {
-        console.log(`\n${idx + 1}. ${org.name}`)
-        console.log(`   EIN (numeric): ${org.ein}`)
-        console.log(`   STREIN (formatted): ${org.strein || 'NOT PROVIDED'}`)
-        console.log(`   Location: ${org.city}, ${org.state}`)
-        console.log(`   NTEE Code: ${org.ntee_code || 'N/A'}`)
-        
-        // Verify field mapping
-        if (!org.strein && typeof org.ein === 'number') {
-          console.log(`   ⚠️  WARNING: strein field missing, will need to format ein`)
-        }
-      })
-    } else {
-      console.log('⚠️  No organizations found')
-    }
+    displayProPublicaResults(data)
   } catch (error) {
     console.error(`❌ Error calling ProPublica API:`, error)
     if (error instanceof Error) {
@@ -94,15 +100,41 @@ async function testDirectProPublicaAPI(query: string): Promise<void> {
 }
 
 /**
+ * Display Next.js API results
+ */
+function displayNextJSResults(organizations: any[]): void {
+  console.log(`✅ Success! Found ${organizations.length} results`)
+  
+  if (organizations.length > 0) {
+    console.log(`\n📋 First ${Math.min(3, organizations.length)} results:`)
+    organizations.slice(0, 3).forEach((org: any, idx: number) => {
+      console.log(`\n${idx + 1}. ${org.name}`)
+      console.log(`   EIN (formatted): ${org.ein}`)
+      console.log(`   Location: ${org.city}, ${org.state}`)
+      console.log(`   Mission: ${org.mission || 'N/A'}`)
+      
+      // Verify EIN formatting
+      if (org.ein && !org.ein.includes('-')) {
+        console.log(`   ⚠️  WARNING: EIN not formatted (should be XX-XXXXXXX format)`)
+      } else if (org.ein && org.ein.includes('-')) {
+        console.log(`   ✅ EIN is properly formatted`)
+      }
+    })
+  } else {
+    console.log('⚠️  No organizations found')
+  }
+}
+
+/**
  * Test our Next.js API route
  */
 async function testNextJSAPI(query: string): Promise<void> {
   console.log('\n🌐 Testing Next.js API Route...')
   console.log(`Query: "${query}"`)
-  console.log(`URL: ${NEXTJS_API_URL}?q=${encodeURIComponent(query)}`)
+  console.log(`URL: ${nextjsApiUrl}?q=${encodeURIComponent(query)}`)
   
   try {
-    const url = `${NEXTJS_API_URL}?q=${encodeURIComponent(query)}`
+    const url = `${nextjsApiUrl}?q=${encodeURIComponent(query)}`
     const response = await fetch(url)
 
     console.log(`Status: ${response.status} ${response.statusText}`)
@@ -123,26 +155,7 @@ async function testNextJSAPI(query: string): Promise<void> {
     }
 
     const organizations = data.organizations || []
-    console.log(`✅ Success! Found ${organizations.length} results`)
-    
-    if (organizations.length > 0) {
-      console.log(`\n📋 First ${Math.min(3, organizations.length)} results:`)
-      organizations.slice(0, 3).forEach((org: any, idx: number) => {
-        console.log(`\n${idx + 1}. ${org.name}`)
-        console.log(`   EIN (formatted): ${org.ein}`)
-        console.log(`   Location: ${org.city}, ${org.state}`)
-        console.log(`   Mission: ${org.mission || 'N/A'}`)
-        
-        // Verify EIN formatting
-        if (org.ein && !org.ein.includes('-')) {
-          console.log(`   ⚠️  WARNING: EIN not formatted (should be XX-XXXXXXX format)`)
-        } else if (org.ein && org.ein.includes('-')) {
-          console.log(`   ✅ EIN is properly formatted`)
-        }
-      })
-    } else {
-      console.log('⚠️  No organizations found')
-    }
+    displayNextJSResults(organizations)
   } catch (error) {
     console.error(`❌ Error calling Next.js API:`, error)
     if (error instanceof Error) {
@@ -179,7 +192,7 @@ async function testErrorHandling(): Promise<void> {
   // Test with query too short (< 3 characters)
   console.log('\n1. Testing query length validation (< 3 chars)...')
   try {
-    const response = await fetch(`${NEXTJS_API_URL}?q=ab`)
+    const response = await fetch(`${nextjsApiUrl}?q=ab`)
     const data = await response.json()
     if (data.organizations && data.organizations.length === 0) {
       console.log('✅ Correctly returns empty array for short queries')
@@ -193,7 +206,7 @@ async function testErrorHandling(): Promise<void> {
   // Test with missing query parameter
   console.log('\n2. Testing missing query parameter...')
   try {
-    const response = await fetch(NEXTJS_API_URL)
+    const response = await fetch(nextjsApiUrl)
     const data = await response.json()
     if (data.error && data.error.includes('Missing')) {
       console.log('✅ Correctly returns error for missing parameter')
@@ -206,6 +219,34 @@ async function testErrorHandling(): Promise<void> {
 }
 
 /**
+ * Compare organization data between direct API and Next.js API
+ */
+function compareOrganizationData(
+  directOrg: ProPublicaOrg,
+  nextjsOrg: any,
+): void {
+  console.log('\n✅ Both APIs returned results')
+  console.log('\nDirect API result:')
+  console.log(`  Name: ${directOrg.name}`)
+  console.log(`  EIN: ${directOrg.ein} (type: ${typeof directOrg.ein})`)
+  console.log(`  STREIN: ${directOrg.strein || 'NOT PROVIDED'}`)
+  
+  console.log('\nNext.js API result:')
+  console.log(`  Name: ${nextjsOrg.name}`)
+  console.log(`  EIN: ${nextjsOrg.ein} (type: ${typeof nextjsOrg.ein})`)
+  
+  // Verify mapping
+  const expectedEin = directOrg.strein || String(directOrg.ein)
+  if (nextjsOrg.ein === expectedEin) {
+    console.log('\n✅ EIN mapping is correct!')
+  } else {
+    console.log(`\n❌ EIN mapping mismatch!`)
+    console.log(`   Expected: ${expectedEin}`)
+    console.log(`   Got: ${nextjsOrg.ein}`)
+  }
+}
+
+/**
  * Compare direct API vs Next.js API responses
  */
 async function compareResponses(query: string): Promise<void> {
@@ -213,48 +254,31 @@ async function compareResponses(query: string): Promise<void> {
   
   try {
     // Get direct API response
-    const directUrl = `${PROPUBLICA_SEARCH_URL}?q=${encodeURIComponent(query)}`
+    const directUrl = `${propublicaSearchUrl}?q=${encodeURIComponent(query)}`
     const directResponse = await fetch(directUrl, {
       headers: { 'User-Agent': 'Bloomwell-AI-Test/1.0' },
     })
     const directData = (await directResponse.json()) as ProPublicaResponse
     
     // Get Next.js API response
-    const nextjsUrl = `${NEXTJS_API_URL}?q=${encodeURIComponent(query)}`
+    const nextjsUrl = `${nextjsApiUrl}?q=${encodeURIComponent(query)}`
     const nextjsResponse = await fetch(nextjsUrl)
     const nextjsData = await nextjsResponse.json()
     
-    if (directData.organizations && directData.organizations.length > 0) {
-      const directOrg = directData.organizations[0]
-      const nextjsOrg = nextjsData.organizations?.[0]
-      
-      if (directOrg) {
-        if (nextjsOrg) {
-          console.log('\n✅ Both APIs returned results')
-          console.log('\nDirect API result:')
-          console.log(`  Name: ${directOrg.name}`)
-          console.log(`  EIN: ${directOrg.ein} (type: ${typeof directOrg.ein})`)
-          console.log(`  STREIN: ${directOrg.strein || 'NOT PROVIDED'}`)
-          
-          console.log('\nNext.js API result:')
-          console.log(`  Name: ${nextjsOrg.name}`)
-          console.log(`  EIN: ${nextjsOrg.ein} (type: ${typeof nextjsOrg.ein})`)
-          
-          // Verify mapping
-          const expectedEin = directOrg.strein || String(directOrg.ein)
-          if (nextjsOrg.ein === expectedEin) {
-            console.log('\n✅ EIN mapping is correct!')
-          } else {
-            console.log(`\n❌ EIN mapping mismatch!`)
-            console.log(`   Expected: ${expectedEin}`)
-            console.log(`   Got: ${nextjsOrg.ein}`)
-          }
-        } else {
-          console.log('⚠️  Next.js API returned no results')
-        }
-      } else {
-        console.log('No direct organization found')
-      }
+    if (!directData.organizations || directData.organizations.length === 0) {
+      return
+    }
+    
+    const directOrg = directData.organizations[0]
+    if (!directOrg) {
+      return
+    }
+    
+    const nextjsOrg = nextjsData.organizations?.[0]
+    if (nextjsOrg) {
+      compareOrganizationData(directOrg, nextjsOrg)
+    } else {
+      console.log('⚠️  Next.js API returned no results')
     }
   } catch (error) {
     console.error('❌ Error comparing responses:', error)
@@ -272,13 +296,13 @@ async function main() {
   testEnvironmentConfig()
   
   // Test direct API
-  await testDirectProPublicaAPI(TEST_QUERY)
+  await testDirectProPublicaAPI(testQuery)
   
   // Test Next.js API
-  await testNextJSAPI(TEST_QUERY)
+  await testNextJSAPI(testQuery)
   
   // Compare responses
-  await compareResponses(TEST_QUERY)
+  await compareResponses(testQuery)
   
   // Test error handling
   await testErrorHandling()

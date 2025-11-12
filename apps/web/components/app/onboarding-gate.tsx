@@ -11,6 +11,71 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const redirectAttemptsRef = useRef(0)
   const hasCheckedRef = useRef(false)
 
+  // Helper: Check if we should retry onboarding check
+  const shouldRetryOnboardingCheck = (
+    fromOnboarding: string | null,
+    lastRedirectTime: string | null,
+    retryCount: number,
+  ): boolean => {
+    if (fromOnboarding !== 'true' || !lastRedirectTime) {
+      return false
+    }
+    const timeSinceRedirect = Date.now() - parseInt(lastRedirectTime)
+    return timeSinceRedirect < 5000 && retryCount < 3
+  }
+
+  // Helper: Clear onboarding redirect flags
+  const clearRedirectFlags = (): void => {
+    sessionStorage.removeItem('fromOnboarding')
+    sessionStorage.removeItem('lastRedirectTime')
+  }
+
+  // Helper: Handle onboarding redirect logic
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  type CheckOnboardingFn = (retryCount: number, delay: number) => Promise<void>
+  const handleOnboardingRedirect = async (
+    retryCount: number,
+    delays: number[],
+    checkOnboarding: CheckOnboardingFn,
+  ): Promise<boolean> => {
+    const currentPath = window.location.pathname
+    if (!currentPath.startsWith('/app') || currentPath.startsWith('/app/onboarding')) {
+      return false
+    }
+
+    const fromOnboarding = sessionStorage.getItem('fromOnboarding')
+    const lastRedirectTime = sessionStorage.getItem('lastRedirectTime')
+    const now = Date.now()
+
+    // Check if we should retry
+    if (shouldRetryOnboardingCheck(fromOnboarding, lastRedirectTime, retryCount)) {
+      hasCheckedRef.current = false
+      await checkOnboarding(retryCount + 1, delays[retryCount + 1] || 1000)
+      return true
+    }
+
+    // Clear flags after 5 seconds
+    if (fromOnboarding === 'true' && lastRedirectTime) {
+      const timeSinceRedirect = now - parseInt(lastRedirectTime)
+      if (timeSinceRedirect >= 5000) {
+        clearRedirectFlags()
+      }
+    }
+
+    // Prevent infinite redirect loops
+    if (redirectAttemptsRef.current >= 3) {
+      console.warn('OnboardingGate: Max redirect attempts reached, allowing access')
+      hasCheckedRef.current = false
+      redirectAttemptsRef.current = 0
+      return true
+    }
+
+    redirectAttemptsRef.current += 1
+    sessionStorage.setItem('lastRedirectTime', now.toString())
+    router.push('/onboarding/step2')
+    return true
+  }
+
   useEffect(() => {
     if (status === 'loading') return
 
@@ -92,52 +157,14 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         
         // Redirect to Step 2 if basic completion is missing (user hasn't selected organization type)
         if (!data.isBasicComplete && typeof window !== 'undefined') {
-          const currentPath = window.location.pathname
-          
-          // Only redirect if on /app routes, not if already on onboarding
-          if (currentPath.startsWith('/app') && !currentPath.startsWith('/app/onboarding')) {
-            // Check if we just came from onboarding (prevent redirect loop)
-            const fromOnboarding = sessionStorage.getItem('fromOnboarding')
-            const lastRedirectTime = sessionStorage.getItem('lastRedirectTime')
-            const now = Date.now()
-            
-            // If we just came from onboarding and it's been less than 5 seconds, retry with progressive delays
-            if (fromOnboarding === 'true' && lastRedirectTime) {
-              const timeSinceRedirect = now - parseInt(lastRedirectTime)
-              
-              // Progressive retry: 1s, 2s, 3s delays
-              if (timeSinceRedirect < 5000 && retryCount < 3) {
-                // Retry with progressive delay
-                hasCheckedRef.current = false
-                await checkOnboarding(retryCount + 1, delays[retryCount + 1] || 1000)
-                return
-              }
-              
-              // After 5 seconds, clear the flag
-              if (timeSinceRedirect >= 5000) {
-                sessionStorage.removeItem('fromOnboarding')
-                sessionStorage.removeItem('lastRedirectTime')
-              }
-            }
-            
-            // Prevent infinite redirect loops - max 3 attempts
-            if (redirectAttemptsRef.current >= 3) {
-              console.warn('OnboardingGate: Max redirect attempts reached, allowing access')
-              hasCheckedRef.current = false
-              redirectAttemptsRef.current = 0
-              return
-            }
-            
-            redirectAttemptsRef.current += 1
-            sessionStorage.setItem('lastRedirectTime', now.toString())
-            router.push('/onboarding/step2')
+          const redirected = await handleOnboardingRedirect(retryCount, delays, checkOnboarding)
+          if (redirected) {
             return
           }
         } else {
           // Reset redirect attempts on successful check
           redirectAttemptsRef.current = 0
-          sessionStorage.removeItem('fromOnboarding')
-          sessionStorage.removeItem('lastRedirectTime')
+          clearRedirectFlags()
           
           // Clean up query parameter if present
           if (skipOnboarding) {

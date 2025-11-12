@@ -6,11 +6,7 @@ import { MarketingHeader } from '@/components/marketing/header'
 import { MarketingFooter } from '@/components/marketing/footer'
 import Link from 'next/link'
 
-export default async function SuccessPage({
-  searchParams,
-}: {
-  searchParams: { session_id?: string }
-}) {
+export default async function SuccessPage() {
   const session = await getServerSession(authOptions)
 
   if (!session) {

@@ -1,8 +1,11 @@
 'use client'
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+type ToggleBillingFn = (isAnnual: boolean) => void
+
 interface BillingToggleProps {
   isAnnual: boolean
-  onToggle: (isAnnual: boolean) => void
+  onToggle: ToggleBillingFn
 }
 
 export function BillingToggle({ isAnnual, onToggle }: BillingToggleProps) {

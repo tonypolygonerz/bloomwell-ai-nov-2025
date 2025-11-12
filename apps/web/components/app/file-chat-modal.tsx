@@ -9,14 +9,19 @@ interface Project {
   color?: string | null
 }
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+type CreateProjectFn = (name: string) => Promise<Project>
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+type FileToProjectFn = (chatId: string, projectId: string | null) => Promise<void>
+
 interface FileChatModalProps {
   isOpen: boolean
   onClose: () => void
   chatId: string
   currentProjectId: string | null
   projects: Project[]
-  onCreateProject: (name: string) => Promise<Project>
-  onFileToProject: (chatId: string, projectId: string | null) => Promise<void>
+  onCreateProject: CreateProjectFn
+  onFileToProject: FileToProjectFn
 }
 
 export function FileChatModal({
