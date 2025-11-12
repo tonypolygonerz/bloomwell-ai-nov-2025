@@ -228,28 +228,32 @@ async function compareResponses(query: string): Promise<void> {
       const directOrg = directData.organizations[0]
       const nextjsOrg = nextjsData.organizations?.[0]
       
-      if (nextjsOrg) {
-        console.log('\n✅ Both APIs returned results')
-        console.log('\nDirect API result:')
-        console.log(`  Name: ${directOrg.name}`)
-        console.log(`  EIN: ${directOrg.ein} (type: ${typeof directOrg.ein})`)
-        console.log(`  STREIN: ${directOrg.strein || 'NOT PROVIDED'}`)
-        
-        console.log('\nNext.js API result:')
-        console.log(`  Name: ${nextjsOrg.name}`)
-        console.log(`  EIN: ${nextjsOrg.ein} (type: ${typeof nextjsOrg.ein})`)
-        
-        // Verify mapping
-        const expectedEin = directOrg.strein || String(directOrg.ein)
-        if (nextjsOrg.ein === expectedEin) {
-          console.log('\n✅ EIN mapping is correct!')
+      if (directOrg) {
+        if (nextjsOrg) {
+          console.log('\n✅ Both APIs returned results')
+          console.log('\nDirect API result:')
+          console.log(`  Name: ${directOrg.name}`)
+          console.log(`  EIN: ${directOrg.ein} (type: ${typeof directOrg.ein})`)
+          console.log(`  STREIN: ${directOrg.strein || 'NOT PROVIDED'}`)
+          
+          console.log('\nNext.js API result:')
+          console.log(`  Name: ${nextjsOrg.name}`)
+          console.log(`  EIN: ${nextjsOrg.ein} (type: ${typeof nextjsOrg.ein})`)
+          
+          // Verify mapping
+          const expectedEin = directOrg.strein || String(directOrg.ein)
+          if (nextjsOrg.ein === expectedEin) {
+            console.log('\n✅ EIN mapping is correct!')
+          } else {
+            console.log(`\n❌ EIN mapping mismatch!`)
+            console.log(`   Expected: ${expectedEin}`)
+            console.log(`   Got: ${nextjsOrg.ein}`)
+          }
         } else {
-          console.log(`\n❌ EIN mapping mismatch!`)
-          console.log(`   Expected: ${expectedEin}`)
-          console.log(`   Got: ${nextjsOrg.ein}`)
+          console.log('⚠️  Next.js API returned no results')
         }
       } else {
-        console.log('⚠️  Next.js API returned no results')
+        console.log('No direct organization found')
       }
     }
   } catch (error) {

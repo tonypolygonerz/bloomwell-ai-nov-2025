@@ -144,7 +144,7 @@ export default function RegisterPage() {
       if (fieldTouched.confirmPassword) {
         setFormData((prev) => {
           const confirmError = validateField('confirmPassword', prev.confirmPassword)
-          setFieldErrors((fieldErrors) => ({ ...fieldErrors, confirmPassword: confirmError }))
+          setFieldErrors((fieldErrors) => ({ ...fieldErrors, confirmPassword: confirmError || '' }))
           return prev
         })
       }
@@ -153,7 +153,7 @@ export default function RegisterPage() {
     // Special handling for confirm password
     if (name === 'confirmPassword' && fieldTouched.confirmPassword) {
       const error = validateField('confirmPassword', value)
-      setFieldErrors((prev) => ({ ...prev, confirmPassword: error }))
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: error || '' }))
     }
   }, [fieldTouched, validateField, calculatePasswordStrength, focusedField])
 

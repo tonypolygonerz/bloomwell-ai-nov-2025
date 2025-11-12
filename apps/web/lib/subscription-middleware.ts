@@ -32,7 +32,7 @@ export async function checkDocumentLimit(userId: string): Promise<{
   if (!accessCheck.hasAccess) {
     return {
       allowed: false,
-      reason: accessCheck.reason,
+      ...(accessCheck.reason ? { reason: accessCheck.reason } : {}),
       documentsUsedToday: 0,
       documentsUsedMonth: 0,
       dailyLimit: 0,
@@ -129,7 +129,7 @@ export async function checkTokenLimit(
   if (!accessCheck.hasAccess) {
     return {
       allowed: false,
-      reason: accessCheck.reason,
+      ...(accessCheck.reason ? { reason: accessCheck.reason } : {}),
       tokensUsedToday: 0,
       dailyLimit: 0,
       tokensRemaining: 0,
