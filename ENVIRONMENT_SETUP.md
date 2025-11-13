@@ -31,19 +31,22 @@ You'll need to expose your local server to the internet. Use one of these option
 #### Option A: Stripe CLI (Recommended)
 
 1. Install Stripe CLI:
+
    ```bash
    # macOS
    brew install stripe/stripe-cli/stripe
-   
+
    # Linux/Windows - see https://stripe.com/docs/stripe-cli
    ```
 
 2. Login to Stripe:
+
    ```bash
    stripe login
    ```
 
 3. Forward webhooks to your local server:
+
    ```bash
    stripe listen --forward-to localhost:3000/api/webhooks/stripe
    ```
@@ -54,11 +57,13 @@ You'll need to expose your local server to the internet. Use one of these option
 
 1. Install ngrok: https://ngrok.com/download
 2. Start your local server:
+
    ```bash
    npm run dev
    ```
 
 3. In another terminal, expose your local server:
+
    ```bash
    ngrok http 3000
    ```
@@ -94,13 +99,13 @@ You'll need to expose your local server to the internet. Use one of these option
    # Stripe Keys (from Step 1)
    STRIPE_SECRET_KEY=sk_test_51AbC123...
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51XyZ789...
-   
+
    # Stripe Webhook Secret (from Step 2)
    STRIPE_WEBHOOK_SECRET=whsec_abc123...
-   
+
    # Database (your existing connection string)
    DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-   
+
    # NextAuth (your existing values)
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-existing-secret
@@ -124,10 +129,10 @@ You'll need to expose your local server to the internet. Use one of these option
 
 Use these test cards in Stripe Checkout for testing:
 
-| Card Number | Description |
-|------------|-------------|
+| Card Number           | Description        |
+| --------------------- | ------------------ |
 | `4242 4242 4242 4242` | Successful payment |
-| `4000 0000 0000 0002` | Card declined |
+| `4000 0000 0000 0002` | Card declined      |
 | `4000 0000 0000 9995` | Insufficient funds |
 
 **Use any future expiry date, any 3-digit CVC, and any ZIP code.**
@@ -169,4 +174,3 @@ Use these test cards in Stripe Checkout for testing:
 ## Next Steps
 
 Once environment variables are configured, proceed to the [Testing Checklist](./TESTING_CHECKLIST.md) to validate the revenue system.
-

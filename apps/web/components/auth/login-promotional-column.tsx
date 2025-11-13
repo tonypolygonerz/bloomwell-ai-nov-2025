@@ -15,7 +15,8 @@ export function LoginPromotionalColumn() {
     {
       icon: Search,
       title: 'New Grants Added Daily',
-      description: 'Fresh federal and state opportunities matched to your mission since your last visit',
+      description:
+        'Fresh federal and state opportunities matched to your mission since your last visit',
     },
     {
       icon: Sparkles,
@@ -65,10 +66,7 @@ export function LoginPromotionalColumn() {
         <div className="mb-3 flex items-center gap-2">
           <div className="flex -space-x-2">
             {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="h-8 w-8 rounded-full bg-white/20 border-2 border-white/20"
-              />
+              <div key={i} className="h-8 w-8 rounded-full bg-white/20 border-2 border-white/20" />
             ))}
           </div>
           <span className="text-sm text-white/80">2,000+ nonprofits</span>
@@ -82,4 +80,3 @@ export function LoginPromotionalColumn() {
     </div>
   )
 }
-

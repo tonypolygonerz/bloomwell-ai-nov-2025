@@ -66,9 +66,7 @@ export function RenameChatModal({
             autoFocus
             disabled={isLoading}
           />
-          {error && (
-            <p className="mt-2 text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           <div className="flex gap-2 mt-4 justify-end">
             <button
               type="button"
@@ -78,11 +76,7 @@ export function RenameChatModal({
             >
               Cancel
             </button>
-            <Button
-              type="submit"
-              disabled={isLoading || !title.trim()}
-              className="px-4 py-2"
-            >
+            <Button type="submit" disabled={isLoading || !title.trim()} className="px-4 py-2">
               {isLoading ? 'Saving...' : 'Save'}
             </Button>
           </div>
@@ -91,4 +85,3 @@ export function RenameChatModal({
     </Dialog>
   )
 }
-

@@ -3,10 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import prisma from '@bloomwell/db'
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -70,10 +67,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -107,4 +101,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-

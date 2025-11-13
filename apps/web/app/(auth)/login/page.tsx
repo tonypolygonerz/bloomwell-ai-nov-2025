@@ -26,7 +26,7 @@ function LoginForm() {
     if (result?.error) {
       setError('Invalid email or password')
     } else {
-      router.push(callbackUrl)
+      router.push(callbackUrl as any)
     }
   }
 
@@ -152,13 +152,15 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-          <p className="text-center text-gray-600">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+            <p className="text-center text-gray-600">Loading...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <LoginForm />
     </Suspense>
   )

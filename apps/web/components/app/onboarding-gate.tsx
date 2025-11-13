@@ -102,7 +102,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         // Add initial delay based on retry count (progressive delays: 1s, 2s, 3s)
         const delay = initialDelay > 0 ? initialDelay : delays[retryCount] || 0
         if (delay > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay))
+          await new Promise((resolve) => setTimeout(resolve, delay))
         }
 
         // Use cache-busting to ensure fresh data
@@ -120,15 +120,15 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         const data = await response.json()
 
         setIsComplete(data.isComplete)
-        
+
         // If bypass parameter is present, allow access temporarily
         if (skipOnboarding && !data.isBasicComplete) {
           console.log('OnboardingGate: Bypass parameter detected, allowing access temporarily')
-          
+
           // Clean up query parameter from URL
           const newUrl = window.location.pathname
-          router.replace(newUrl, { scroll: false })
-          
+          router.replace(newUrl as any, { scroll: false })
+
           // Set up background check after 3 seconds
           setTimeout(async () => {
             try {
@@ -149,12 +149,12 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
               console.error('Background status check failed:', error)
             }
           }, 3000)
-          
+
           // Allow access for now
           hasCheckedRef.current = false
           return
         }
-        
+
         // Redirect to Step 2 if basic completion is missing (user hasn't selected organization type)
         if (!data.isBasicComplete && typeof window !== 'undefined') {
           const redirected = await handleOnboardingRedirect(retryCount, delays, checkOnboarding)
@@ -165,26 +165,31 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
           // Reset redirect attempts on successful check
           redirectAttemptsRef.current = 0
           clearRedirectFlags()
-          
+
           // Clean up query parameter if present
           if (skipOnboarding) {
             const newUrl = window.location.pathname
-            router.replace(newUrl, { scroll: false })
+            router.replace(newUrl as any, { scroll: false })
           }
         }
       } catch (error) {
         console.error('Failed to check onboarding status:', error)
         setIsComplete(false)
-        
+
         // On error, retry with progressive delays (up to 3 attempts)
         if (retryCount < 3) {
           hasCheckedRef.current = false
           const delays = [1000, 2000, 3000]
-          setTimeout(() => checkOnboarding(retryCount + 1, delays[retryCount] || 1000), delays[retryCount] || 1000)
+          setTimeout(
+            () => checkOnboarding(retryCount + 1, delays[retryCount] || 1000),
+            delays[retryCount] || 1000,
+          )
         } else {
           // After 3 retries, if bypass is present, allow access
           if (skipOnboarding) {
-            console.warn('OnboardingGate: Error after retries, but bypass parameter present - allowing access')
+            console.warn(
+              'OnboardingGate: Error after retries, but bypass parameter present - allowing access',
+            )
             hasCheckedRef.current = false
           }
         }

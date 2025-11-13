@@ -27,7 +27,7 @@ export function ProfileCompletionModal({
   const router = useRouter()
 
   const handleStepClick = (route: string) => {
-    router.push(route)
+    router.push(route as any)
     onClose()
   }
 
@@ -50,12 +50,7 @@ export function ProfileCompletionModal({
             className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             aria-label="Close"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -140,4 +135,3 @@ export function ProfileCompletionModal({
     </Dialog>
   )
 }
-

@@ -1,14 +1,14 @@
 #!/usr/bin/env tsx
 /**
  * Test script for ProPublica API integration
- * 
+ *
  * This script tests:
  * 1. Direct ProPublica API calls
  * 2. Our Next.js API route
  * 3. Data mapping (especially `strein` field)
  * 4. Error handling
  * 5. Environment variable configuration
- * 
+ *
  * Usage: npx tsx apps/web/scripts/test-propublica-api.ts
  */
 
@@ -44,7 +44,7 @@ function displayProPublicaResults(data: ProPublicaResponse): void {
   console.log(`✅ Success! Found ${data.total_results} results`)
   console.log(`API Version: ${data.api_version}`)
   console.log(`Pages: ${data.num_pages}, Current Page: ${data.cur_page}`)
-  
+
   if (data.organizations && data.organizations.length > 0) {
     console.log(`\n📋 First ${Math.min(3, data.organizations.length)} results:`)
     data.organizations.slice(0, 3).forEach((org, idx) => {
@@ -53,7 +53,7 @@ function displayProPublicaResults(data: ProPublicaResponse): void {
       console.log(`   STREIN (formatted): ${org.strein || 'NOT PROVIDED'}`)
       console.log(`   Location: ${org.city}, ${org.state}`)
       console.log(`   NTEE Code: ${org.ntee_code || 'N/A'}`)
-      
+
       // Verify field mapping
       if (!org.strein && typeof org.ein === 'number') {
         console.log(`   ⚠️  WARNING: strein field missing, will need to format ein`)
@@ -71,7 +71,7 @@ async function testDirectProPublicaAPI(query: string): Promise<void> {
   console.log('\n🔍 Testing Direct ProPublica API...')
   console.log(`Query: "${query}"`)
   console.log(`URL: ${propublicaSearchUrl}?q=${encodeURIComponent(query)}`)
-  
+
   try {
     const url = `${propublicaSearchUrl}?q=${encodeURIComponent(query)}`
     const response = await fetch(url, {
@@ -81,7 +81,7 @@ async function testDirectProPublicaAPI(query: string): Promise<void> {
     })
 
     console.log(`Status: ${response.status} ${response.statusText}`)
-    
+
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`❌ API Error: ${errorText}`)
@@ -104,7 +104,7 @@ async function testDirectProPublicaAPI(query: string): Promise<void> {
  */
 function displayNextJSResults(organizations: any[]): void {
   console.log(`✅ Success! Found ${organizations.length} results`)
-  
+
   if (organizations.length > 0) {
     console.log(`\n📋 First ${Math.min(3, organizations.length)} results:`)
     organizations.slice(0, 3).forEach((org: any, idx: number) => {
@@ -112,7 +112,7 @@ function displayNextJSResults(organizations: any[]): void {
       console.log(`   EIN (formatted): ${org.ein}`)
       console.log(`   Location: ${org.city}, ${org.state}`)
       console.log(`   Mission: ${org.mission || 'N/A'}`)
-      
+
       // Verify EIN formatting
       if (org.ein && !org.ein.includes('-')) {
         console.log(`   ⚠️  WARNING: EIN not formatted (should be XX-XXXXXXX format)`)
@@ -132,13 +132,13 @@ async function testNextJSAPI(query: string): Promise<void> {
   console.log('\n🌐 Testing Next.js API Route...')
   console.log(`Query: "${query}"`)
   console.log(`URL: ${nextjsApiUrl}?q=${encodeURIComponent(query)}`)
-  
+
   try {
     const url = `${nextjsApiUrl}?q=${encodeURIComponent(query)}`
     const response = await fetch(url)
 
     console.log(`Status: ${response.status} ${response.statusText}`)
-    
+
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`❌ API Error: ${errorText}`)
@@ -148,7 +148,7 @@ async function testNextJSAPI(query: string): Promise<void> {
     }
 
     const data = await response.json()
-    
+
     if (data.error) {
       console.error(`❌ API returned error: ${data.error}`)
       return
@@ -172,7 +172,7 @@ async function testNextJSAPI(query: string): Promise<void> {
  */
 function testEnvironmentConfig(): void {
   console.log('\n🔧 Testing Environment Configuration...')
-  
+
   const apiKey = process.env.PROPUBLICA_API_KEY
   if (apiKey) {
     console.log(`✅ PROPUBLICA_API_KEY is set (length: ${apiKey.length})`)
@@ -188,7 +188,7 @@ function testEnvironmentConfig(): void {
  */
 async function testErrorHandling(): Promise<void> {
   console.log('\n🧪 Testing Error Handling...')
-  
+
   // Test with query too short (< 3 characters)
   console.log('\n1. Testing query length validation (< 3 chars)...')
   try {
@@ -202,7 +202,7 @@ async function testErrorHandling(): Promise<void> {
   } catch (error) {
     console.error('❌ Error testing short query:', error)
   }
-  
+
   // Test with missing query parameter
   console.log('\n2. Testing missing query parameter...')
   try {
@@ -221,20 +221,17 @@ async function testErrorHandling(): Promise<void> {
 /**
  * Compare organization data between direct API and Next.js API
  */
-function compareOrganizationData(
-  directOrg: ProPublicaOrg,
-  nextjsOrg: any,
-): void {
+function compareOrganizationData(directOrg: ProPublicaOrg, nextjsOrg: any): void {
   console.log('\n✅ Both APIs returned results')
   console.log('\nDirect API result:')
   console.log(`  Name: ${directOrg.name}`)
   console.log(`  EIN: ${directOrg.ein} (type: ${typeof directOrg.ein})`)
   console.log(`  STREIN: ${directOrg.strein || 'NOT PROVIDED'}`)
-  
+
   console.log('\nNext.js API result:')
   console.log(`  Name: ${nextjsOrg.name}`)
   console.log(`  EIN: ${nextjsOrg.ein} (type: ${typeof nextjsOrg.ein})`)
-  
+
   // Verify mapping
   const expectedEin = directOrg.strein || String(directOrg.ein)
   if (nextjsOrg.ein === expectedEin) {
@@ -251,7 +248,7 @@ function compareOrganizationData(
  */
 async function compareResponses(query: string): Promise<void> {
   console.log('\n📊 Comparing Direct API vs Next.js API Responses...')
-  
+
   try {
     // Get direct API response
     const directUrl = `${propublicaSearchUrl}?q=${encodeURIComponent(query)}`
@@ -259,21 +256,21 @@ async function compareResponses(query: string): Promise<void> {
       headers: { 'User-Agent': 'Bloomwell-AI-Test/1.0' },
     })
     const directData = (await directResponse.json()) as ProPublicaResponse
-    
+
     // Get Next.js API response
     const nextjsUrl = `${nextjsApiUrl}?q=${encodeURIComponent(query)}`
     const nextjsResponse = await fetch(nextjsUrl)
     const nextjsData = await nextjsResponse.json()
-    
+
     if (!directData.organizations || directData.organizations.length === 0) {
       return
     }
-    
+
     const directOrg = directData.organizations[0]
     if (!directOrg) {
       return
     }
-    
+
     const nextjsOrg = nextjsData.organizations?.[0]
     if (nextjsOrg) {
       compareOrganizationData(directOrg, nextjsOrg)
@@ -291,22 +288,22 @@ async function compareResponses(query: string): Promise<void> {
 async function main() {
   console.log('🚀 ProPublica API Test Suite')
   console.log('='.repeat(50))
-  
+
   // Test environment
   testEnvironmentConfig()
-  
+
   // Test direct API
   await testDirectProPublicaAPI(testQuery)
-  
+
   // Test Next.js API
   await testNextJSAPI(testQuery)
-  
+
   // Compare responses
   await compareResponses(testQuery)
-  
+
   // Test error handling
   await testErrorHandling()
-  
+
   console.log('\n' + '='.repeat(50))
   console.log('✅ Test suite completed!')
   console.log('\n💡 Tips:')
@@ -320,7 +317,3 @@ main().catch((error) => {
   console.error('❌ Fatal error:', error)
   process.exit(1)
 })
-
-
-
-

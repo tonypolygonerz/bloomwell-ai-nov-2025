@@ -9,11 +9,11 @@ export async function GET(request: NextRequest) {
   if (ein) {
     const org = await searchProPublicaOrg(ein)
     if (org) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         organization: {
           ...org,
           ein: org.strein || String(org.ein),
-        }
+        },
       })
     }
     return NextResponse.json({ organization: null })
@@ -24,14 +24,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ organizations: [] })
     }
     const orgs = await searchProPublicaByName(query)
-    return NextResponse.json({ 
-      organizations: orgs.map(org => ({
+    return NextResponse.json({
+      organizations: orgs.map((org) => ({
         name: org.name,
         ein: org.strein || String(org.ein),
         city: org.city,
         state: org.state,
         mission: org.ntee_type || org.classification || '',
-      }))
+      })),
     })
   }
 

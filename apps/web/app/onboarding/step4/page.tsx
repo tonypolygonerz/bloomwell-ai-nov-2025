@@ -24,7 +24,7 @@ export default function Step4Page() {
     try {
       const response = await fetch('/api/onboarding/status')
       const data = await response.json()
-      
+
       if (data.isFullComplete) {
         router.push('/app')
       } else {
@@ -58,7 +58,8 @@ export default function Step4Page() {
         </p>
 
         <div className="mb-6 space-y-6">
-          {organization?.mission && (organization?.budget || organization?.revenueBracket || organization?.staffSize) ? (
+          {organization?.mission &&
+          (organization?.budget || organization?.revenueBracket || organization?.staffSize) ? (
             <div className="rounded-lg bg-green-50 p-4">
               <p className="font-semibold text-green-800">✓ Profile Information Complete</p>
               <p className="mt-1 text-xs text-green-700">
@@ -69,7 +70,8 @@ export default function Step4Page() {
             <div className="rounded-lg bg-yellow-50 p-4">
               <p className="font-semibold text-yellow-800">Profile Partially Complete</p>
               <p className="mt-1 text-xs text-yellow-700">
-                Complete your mission and capacity details to unlock personalized grant recommendations.
+                Complete your mission and capacity details to unlock personalized grant
+                recommendations.
               </p>
             </div>
           )}

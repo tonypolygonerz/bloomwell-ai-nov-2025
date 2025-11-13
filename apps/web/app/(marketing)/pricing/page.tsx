@@ -20,7 +20,9 @@ export default function PricingPage() {
   const { status } = useSession()
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null)
   const [starterBillingCycle, setStarterBillingCycle] = useState<'monthly' | 'annual'>('monthly')
-  const [enterpriseBillingCycle, setEnterpriseBillingCycle] = useState<'monthly' | 'annual'>('monthly')
+  const [enterpriseBillingCycle, setEnterpriseBillingCycle] = useState<'monthly' | 'annual'>(
+    'monthly',
+  )
 
   const handleSubscribe = async (priceId: string) => {
     // Check authentication first
@@ -244,6 +246,3 @@ export default function PricingPage() {
     </div>
   )
 }
-
-
-

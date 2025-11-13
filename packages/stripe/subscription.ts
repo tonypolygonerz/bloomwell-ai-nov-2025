@@ -118,4 +118,3 @@ export async function hasSubscriptionAccess(userId: string): Promise<boolean> {
     subscription.isTrialActive
   )
 }
-

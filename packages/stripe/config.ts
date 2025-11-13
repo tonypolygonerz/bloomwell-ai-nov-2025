@@ -32,10 +32,16 @@ export const SUBSCRIPTION_FEATURES = {
 } as const
 
 // Subscription status types
-export type SubscriptionStatus = 'active' | 'canceled' | 'trialing' | 'past_due' | 'incomplete' | null
+export type SubscriptionStatus =
+  | 'active'
+  | 'canceled'
+  | 'trialing'
+  | 'past_due'
+  | 'incomplete'
+  | null
 
 // Feature limits type
-export type SubscriptionFeatures = typeof SUBSCRIPTION_FEATURES[SubscriptionTier]
+export type SubscriptionFeatures = (typeof SUBSCRIPTION_FEATURES)[SubscriptionTier]
 
 // Helper function to get all price IDs
 export function getAllPriceIds(): string[] {
@@ -60,25 +66,11 @@ export function getTierFromPriceId(priceId: string): SubscriptionTier | null {
 
 // Helper function to get billing cycle from price ID
 export function getBillingCycleFromPriceId(priceId: string): BillingCycle | null {
-  if (
-    priceId === STRIPE_PRICES.starter_monthly ||
-    priceId === STRIPE_PRICES.enterprise_monthly
-  ) {
+  if (priceId === STRIPE_PRICES.starter_monthly || priceId === STRIPE_PRICES.enterprise_monthly) {
     return 'monthly'
   }
-  if (
-    priceId === STRIPE_PRICES.starter_annual ||
-    priceId === STRIPE_PRICES.enterprise_annual
-  ) {
+  if (priceId === STRIPE_PRICES.starter_annual || priceId === STRIPE_PRICES.enterprise_annual) {
     return 'annual'
   }
   return null
 }
-
-
-
-
-
-
-
-

@@ -35,4 +35,3 @@ export function BillingToggle({ isAnnual, onToggle }: BillingToggleProps) {
     </div>
   )
 }
-

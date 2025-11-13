@@ -13,6 +13,7 @@ Quick reference checklist for manual testing.
 ## Critical Tests (Must Pass)
 
 ### Test 1: Basic Skip Flow ⭐ PRIMARY FIX
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Use default organization type (don't change)
 - [ ] Don't enter any organization details
@@ -25,6 +26,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Test 2: Skip with Organization Type
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Select different organization type
 - [ ] Click "Skip"
@@ -33,6 +35,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Test 4: OnboardingGate Retry Logic
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Click "Skip"
 - [ ] Monitor Network tab for status API calls
@@ -42,6 +45,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Test 8: Redirect Loop Prevention
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Click "Skip"
 - [ ] Count redirects to `/onboarding/step2`
@@ -50,6 +54,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Test 9: SessionStorage Flags
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Clear sessionStorage
 - [ ] Click "Skip"
@@ -62,6 +67,7 @@ Quick reference checklist for manual testing.
 ## Additional Tests
 
 ### Test 11: Direct Navigation
+
 - [ ] Create new user (or ensure no onboarding data)
 - [ ] Directly navigate to `http://localhost:3000/app`
 - [ ] **VERIFY:** Redirected to `/onboarding/step2` (if incomplete)
@@ -69,6 +75,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Test 13: Multiple Browser Tabs
+
 - [ ] Open `/onboarding/step2` in Tab 1
 - [ ] Open `/onboarding/step2` in Tab 2
 - [ ] Click "Skip" in Tab 1
@@ -77,6 +84,7 @@ Quick reference checklist for manual testing.
 - [ ] **Result:** ✅ PASS / ❌ FAIL
 
 ### Browser Console Verification
+
 - [ ] Navigate to `/onboarding/step2`
 - [ ] Open Console tab
 - [ ] Run `browser-verification-script.js`
@@ -115,4 +123,3 @@ All critical tests must pass:
 ---
 
 **Status:** ⬜ Not Started / 🟡 In Progress / ✅ Complete / ❌ Failed
-

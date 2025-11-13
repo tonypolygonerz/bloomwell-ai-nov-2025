@@ -23,9 +23,7 @@ export async function getCustomer(customerId: string): Promise<Stripe.Customer |
 }
 
 // Get Stripe subscription by ID
-export async function getSubscription(
-  subscriptionId: string,
-): Promise<Stripe.Subscription | null> {
+export async function getSubscription(subscriptionId: string): Promise<Stripe.Subscription | null> {
   try {
     return await stripe.subscriptions.retrieve(subscriptionId)
   } catch (error) {
@@ -66,4 +64,3 @@ export async function createCustomer(
     return null
   }
 }
-

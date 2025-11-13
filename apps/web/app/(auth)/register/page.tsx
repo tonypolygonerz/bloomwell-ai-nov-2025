@@ -54,12 +54,9 @@ export default function RegisterPage() {
   // Show OAuth when all 4 main fields (firstName, lastName, email, password) are empty
   // Hide OAuth when any field has a value
   useEffect(() => {
-    const hasFieldValues = 
-      formData.firstName || 
-      formData.lastName || 
-      formData.email || 
-      formData.password
-    
+    const hasFieldValues =
+      formData.firstName || formData.lastName || formData.email || formData.password
+
     // Show OAuth immediately when all 4 fields are empty (regardless of focus state)
     setIsOAuthVisible(!hasFieldValues)
   }, [formData])
@@ -67,7 +64,7 @@ export default function RegisterPage() {
   // Calculate password strength
   const calculatePasswordStrength = useCallback((password: string): PasswordStrength | null => {
     if (password.length === 0) return null
-    
+
     let strength = 0
     if (password.length >= 8) strength++
     if (password.length >= 12) strength++
@@ -81,33 +78,36 @@ export default function RegisterPage() {
   }, [])
 
   // Validate individual field
-  const validateField = useCallback((name: keyof typeof formData, value: string): string | undefined => {
-    switch (name) {
-      case 'firstName':
-        if (!value.trim()) return 'First name is required'
-        if (value.trim().length < 2) return 'First name must be at least 2 characters'
-        return undefined
-      case 'lastName':
-        if (!value.trim()) return 'Last name is required'
-        if (value.trim().length < 2) return 'Last name must be at least 2 characters'
-        return undefined
-      case 'email':
-        if (!value.trim()) return 'Email is required'
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(value)) return 'Please enter a valid email address'
-        return undefined
-      case 'password':
-        if (!value) return 'Password is required'
-        if (value.length < 8) return 'Password must be at least 8 characters'
-        return undefined
-      case 'confirmPassword':
-        if (!value) return 'Please confirm your password'
-        if (value !== formData.password) return 'Passwords do not match'
-        return undefined
-      default:
-        return undefined
-    }
-  }, [formData.password])
+  const validateField = useCallback(
+    (name: keyof typeof formData, value: string): string | undefined => {
+      switch (name) {
+        case 'firstName':
+          if (!value.trim()) return 'First name is required'
+          if (value.trim().length < 2) return 'First name must be at least 2 characters'
+          return undefined
+        case 'lastName':
+          if (!value.trim()) return 'Last name is required'
+          if (value.trim().length < 2) return 'Last name must be at least 2 characters'
+          return undefined
+        case 'email':
+          if (!value.trim()) return 'Email is required'
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!emailRegex.test(value)) return 'Please enter a valid email address'
+          return undefined
+        case 'password':
+          if (!value) return 'Password is required'
+          if (value.length < 8) return 'Password must be at least 8 characters'
+          return undefined
+        case 'confirmPassword':
+          if (!value) return 'Please confirm your password'
+          if (value !== formData.password) return 'Passwords do not match'
+          return undefined
+        default:
+          return undefined
+      }
+    },
+    [formData.password],
+  )
 
   // Handle field focus - track which field is focused
   const handleFocus = useCallback((name: keyof typeof formData) => {
@@ -117,45 +117,54 @@ export default function RegisterPage() {
   }, [])
 
   // Handle field blur for validation and OAuth visibility
-  const handleBlur = useCallback((name: keyof typeof formData) => {
-    setFieldTouched((prev) => ({ ...prev, [name]: true }))
-    const error = validateField(name, formData[name])
-    setFieldErrors((prev) => ({ ...prev, [name]: error }))
-    
-    // Clear focused field - useEffect will handle OAuth visibility
-    setFocusedField((prev) => (prev === name ? null : prev))
-  }, [formData, validateField])
+  const handleBlur = useCallback(
+    (name: keyof typeof formData) => {
+      setFieldTouched((prev) => ({ ...prev, [name]: true }))
+      const error = validateField(name, formData[name])
+      setFieldErrors((prev) => ({ ...prev, [name]: error }))
+
+      // Clear focused field - useEffect will handle OAuth visibility
+      setFocusedField((prev) => (prev === name ? null : prev))
+    },
+    [formData, validateField],
+  )
 
   // Handle field change
-  const handleFieldChange = useCallback((name: keyof typeof formData, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    setFormError('')
+  const handleFieldChange = useCallback(
+    (name: keyof typeof formData, value: string) => {
+      setFormData((prev) => ({ ...prev, [name]: value }))
+      setFormError('')
 
-    // Real-time validation for touched fields
-    if (fieldTouched[name]) {
-      const error = validateField(name, value)
-      setFieldErrors((prev) => ({ ...prev, [name]: error }))
-    }
-
-    // Special handling for password
-    if (name === 'password') {
-      setPasswordStrength(calculatePasswordStrength(value))
-      // Re-validate confirm password if it's been touched
-      if (fieldTouched.confirmPassword) {
-        setFormData((prev) => {
-          const confirmError = validateField('confirmPassword', prev.confirmPassword)
-          setFieldErrors((fieldErrors) => ({ ...fieldErrors, confirmPassword: confirmError || '' }))
-          return prev
-        })
+      // Real-time validation for touched fields
+      if (fieldTouched[name]) {
+        const error = validateField(name, value)
+        setFieldErrors((prev) => ({ ...prev, [name]: error }))
       }
-    }
 
-    // Special handling for confirm password
-    if (name === 'confirmPassword' && fieldTouched.confirmPassword) {
-      const error = validateField('confirmPassword', value)
-      setFieldErrors((prev) => ({ ...prev, confirmPassword: error || '' }))
-    }
-  }, [fieldTouched, validateField, calculatePasswordStrength, focusedField])
+      // Special handling for password
+      if (name === 'password') {
+        setPasswordStrength(calculatePasswordStrength(value))
+        // Re-validate confirm password if it's been touched
+        if (fieldTouched.confirmPassword) {
+          setFormData((prev) => {
+            const confirmError = validateField('confirmPassword', prev.confirmPassword)
+            setFieldErrors((fieldErrors) => ({
+              ...fieldErrors,
+              confirmPassword: confirmError || '',
+            }))
+            return prev
+          })
+        }
+      }
+
+      // Special handling for confirm password
+      if (name === 'confirmPassword' && fieldTouched.confirmPassword) {
+        const error = validateField('confirmPassword', value)
+        setFieldErrors((prev) => ({ ...prev, confirmPassword: error || '' }))
+      }
+    },
+    [fieldTouched, validateField, calculatePasswordStrength, focusedField],
+  )
 
   // Validate entire form
   const validateForm = useCallback((): boolean => {
@@ -270,7 +279,9 @@ export default function RegisterPage() {
           <h1 className="mb-2 text-[32px] font-bold leading-tight text-gray-900 lg:text-[36px]">
             Create your account
           </h1>
-          <p className="mb-6 text-base text-gray-600">Start discovering grants in under 2 minutes</p>
+          <p className="mb-6 text-base text-gray-600">
+            Start discovering grants in under 2 minutes
+          </p>
 
           <ProgressIndicator currentStep={1} totalSteps={3} />
 
@@ -330,7 +341,12 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-label="Registration form">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            noValidate
+            aria-label="Registration form"
+          >
             {/* Form-level error */}
             {formError && (
               <div
@@ -358,8 +374,14 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="mb-2 block text-sm font-semibold text-gray-700">
-                  First name <span className="text-red-600" aria-label="required">*</span>
+                <label
+                  htmlFor="firstName"
+                  className="mb-2 block text-sm font-semibold text-gray-700"
+                >
+                  First name{' '}
+                  <span className="text-red-600" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <div className="relative">
                   <Input
@@ -386,13 +408,27 @@ export default function RegisterPage() {
                       stroke="currentColor"
                       aria-hidden="true"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
                 </div>
                 {fieldErrors.firstName && (
-                  <p id="firstName-error" className="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
-                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <p
+                    id="firstName-error"
+                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                    role="alert"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
                       <path
                         fillRule="evenodd"
                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -404,8 +440,14 @@ export default function RegisterPage() {
                 )}
               </div>
               <div>
-                <label htmlFor="lastName" className="mb-2 block text-sm font-semibold text-gray-700">
-                  Last name <span className="text-red-600" aria-label="required">*</span>
+                <label
+                  htmlFor="lastName"
+                  className="mb-2 block text-sm font-semibold text-gray-700"
+                >
+                  Last name{' '}
+                  <span className="text-red-600" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <div className="relative">
                   <Input
@@ -432,13 +474,27 @@ export default function RegisterPage() {
                       stroke="currentColor"
                       aria-hidden="true"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
                 </div>
                 {fieldErrors.lastName && (
-                  <p id="lastName-error" className="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
-                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <p
+                    id="lastName-error"
+                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                    role="alert"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
                       <path
                         fillRule="evenodd"
                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -452,7 +508,10 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-700">
-                Email <span className="text-red-600" aria-label="required">*</span>
+                Email{' '}
+                <span className="text-red-600" aria-label="required">
+                  *
+                </span>
               </label>
               <div className="relative">
                 <Input
@@ -480,13 +539,27 @@ export default function RegisterPage() {
                     stroke="currentColor"
                     aria-hidden="true"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 )}
               </div>
               {fieldErrors.email && (
-                <p id="email-error" className="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <p
+                  id="email-error"
+                  className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                  role="alert"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -499,7 +572,10 @@ export default function RegisterPage() {
             </div>
             <div>
               <label htmlFor="password" className="mb-2 block text-sm font-semibold text-gray-700">
-                Password <span className="text-red-600" aria-label="required">*</span>
+                Password{' '}
+                <span className="text-red-600" aria-label="required">
+                  *
+                </span>
               </label>
               <div className="relative">
                 <Input
@@ -532,7 +608,13 @@ export default function RegisterPage() {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -541,7 +623,13 @@ export default function RegisterPage() {
                       />
                     </svg>
                   ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -566,7 +654,12 @@ export default function RegisterPage() {
                       <div
                         className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
                         style={{
-                          width: passwordStrength === 'weak' ? '33%' : passwordStrength === 'medium' ? '66%' : '100%',
+                          width:
+                            passwordStrength === 'weak'
+                              ? '33%'
+                              : passwordStrength === 'medium'
+                                ? '66%'
+                                : '100%',
                         }}
                         aria-hidden="true"
                       />
@@ -588,7 +681,11 @@ export default function RegisterPage() {
                   <div className="text-xs text-gray-600 space-y-1">
                     <p className="font-medium">Password requirements:</p>
                     <ul className="list-none space-y-0.5 ml-2">
-                      <li className={formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
+                      <li
+                        className={
+                          formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'
+                        }
+                      >
                         <span className="mr-1">{formData.password.length >= 8 ? '✓' : '○'}</span>
                         At least 8 characters
                       </li>
@@ -600,16 +697,28 @@ export default function RegisterPage() {
                         }
                       >
                         <span className="mr-1">
-                          {/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password) ? '✓' : '○'}
+                          {/[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password)
+                            ? '✓'
+                            : '○'}
                         </span>
                         Mix of uppercase and lowercase
                       </li>
-                      <li className={/\d/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
+                      <li
+                        className={
+                          /\d/.test(formData.password) ? 'text-green-600' : 'text-gray-500'
+                        }
+                      >
                         <span className="mr-1">{/\d/.test(formData.password) ? '✓' : '○'}</span>
                         At least one number
                       </li>
-                      <li className={/[^a-zA-Z\d]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
-                        <span className="mr-1">{/[^a-zA-Z\d]/.test(formData.password) ? '✓' : '○'}</span>
+                      <li
+                        className={
+                          /[^a-zA-Z\d]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'
+                        }
+                      >
+                        <span className="mr-1">
+                          {/[^a-zA-Z\d]/.test(formData.password) ? '✓' : '○'}
+                        </span>
                         At least one special character
                       </li>
                     </ul>
@@ -617,8 +726,17 @@ export default function RegisterPage() {
                 </div>
               )}
               {fieldErrors.password && (
-                <p id="password-error" className="mt-1 text-sm text-red-600 flex items-center gap-1" role="alert">
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <p
+                  id="password-error"
+                  className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                  role="alert"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -630,8 +748,14 @@ export default function RegisterPage() {
               )}
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-gray-700">
-                Confirm Password <span className="text-red-600" aria-label="required">*</span>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-2 block text-sm font-semibold text-gray-700"
+              >
+                Confirm Password{' '}
+                <span className="text-red-600" aria-label="required">
+                  *
+                </span>
               </label>
               <div className="relative">
                 <Input
@@ -648,7 +772,9 @@ export default function RegisterPage() {
                   required
                   aria-required="true"
                   aria-invalid={isFieldInvalid('confirmPassword')}
-                  aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
+                  aria-describedby={
+                    fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined
+                  }
                   autoComplete="new-password"
                   className="pr-10"
                 />
@@ -656,11 +782,19 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700"
-                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  aria-label={
+                    showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'
+                  }
                   tabIndex={-1}
                 >
                   {showConfirmPassword ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -669,7 +803,13 @@ export default function RegisterPage() {
                       />
                     </svg>
                   ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -693,7 +833,12 @@ export default function RegisterPage() {
                     stroke="currentColor"
                     aria-hidden="true"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 )}
               </div>
@@ -703,7 +848,12 @@ export default function RegisterPage() {
                   className="mt-1 text-sm text-red-600 flex items-center gap-1"
                   role="alert"
                 >
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -753,11 +903,17 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-gray-700">
             By signing up, you agree to our{' '}
-            <a href="/terms" className="text-gray-800 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:ring-offset-1 rounded">
+            <a
+              href="/terms"
+              className="text-gray-800 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:ring-offset-1 rounded"
+            >
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="/privacy" className="text-gray-800 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:ring-offset-1 rounded">
+            <a
+              href="/privacy"
+              className="text-gray-800 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:ring-offset-1 rounded"
+            >
               Privacy Policy
             </a>
             .

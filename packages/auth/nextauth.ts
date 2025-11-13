@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
           token.trialEndsAt = dbUser.trialEndsAt?.toISOString()
           token.subscriptionStatus = dbUser.subscriptionStatus
           token.subscriptionPriceId = dbUser.currentPriceId
-          
+
           // Get subscription tier from price ID
           if (dbUser.currentPriceId) {
             const subscription = await getUserSubscription(user.id)
@@ -95,7 +95,7 @@ export const authOptions: NextAuthOptions = {
           token.trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
         }
       }
-      
+
       // Update subscription info on each token refresh (but not on every request to avoid overhead)
       // Only refresh if token doesn't have subscription info or if explicitly triggered
       if (token.userId && (!token.subscriptionStatus || trigger === 'update')) {
@@ -104,7 +104,7 @@ export const authOptions: NextAuthOptions = {
         token.subscriptionTier = subscription.tier
         token.subscriptionPriceId = subscription.priceId
       }
-      
+
       if (trigger === 'update' && session) {
         if ('role' in session) token.role = session.role as 'USER' | 'ADMIN'
         if ('trialEndsAt' in session) token.trialEndsAt = session.trialEndsAt as string

@@ -11,7 +11,12 @@ const sizeClasses = {
   default: 'px-4 py-2',
 }
 
-export const Button: React.FC<ButtonProps> = ({ className = '', size = 'default', type = 'button', ...props }) => {
+export const Button: React.FC<ButtonProps> = ({
+  className = '',
+  size = 'default',
+  type = 'button',
+  ...props
+}) => {
   const sizeClass = sizeClasses[size]
   return (
     <button

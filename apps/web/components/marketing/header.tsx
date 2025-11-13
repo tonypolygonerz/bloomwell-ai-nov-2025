@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button } from '@bloomwell/ui'
+import { ArrowRightIcon } from '@/components/ui/icons'
 
 export function MarketingHeader() {
   return (
@@ -8,13 +8,19 @@ export function MarketingHeader() {
         {/* Logo + Brand Name */}
         <Link href="/" className="flex items-center gap-3">
           {/* Logo: Green square with lightning bolt */}
-          <div className="relative h-8 w-8 rounded-md bg-gradient-to-br from-brand via-brand to-brand/90 flex items-center justify-center shadow-sm">
+          <div
+            className="relative h-8 w-8 rounded-lg flex items-center justify-center shadow-sm overflow-hidden"
+            style={{
+              background: 'linear-gradient(to bottom right, #16A34A, #00A150)',
+            }}
+          >
             <svg
-              width="14"
-              height="14"
+              width="18"
+              height="18"
               viewBox="0 0 14 14"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="drop-shadow-[1px_1px_2px_rgba(0,0,0,0.2)]"
             >
               <path d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z" fill="white" />
             </svg>
@@ -38,31 +44,16 @@ export function MarketingHeader() {
           </Link>
         </div>
 
-        {/* Right Side: Sign In + CTA Button */}
+        {/* Right Side: Login + CTA Button */}
         <div className="flex items-center space-x-4">
-          <Link href="/login" className="text-gray-700 hover:text-brand">
-            Sign In
+          <Link href="/login" className="text-gray-700 hover:text-brand font-medium">
+            Login
           </Link>
           <Link href="/register">
-            <Button className="flex items-center gap-1.5 font-bold">
+            <button className="inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-button font-medium transition-colors">
               Get Started
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-white"
-              >
-                <path
-                  d="M6 12L10 8L6 4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
+              <ArrowRightIcon className="w-4 h-4" />
+            </button>
           </Link>
         </div>
       </nav>

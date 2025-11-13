@@ -119,7 +119,7 @@ export function ProfileCompletionFloating() {
               fill="none"
               stroke="currentColor"
               strokeWidth="3"
-              strokeDasharray={`${completionData.completionPercentage * 100.53 / 100}, 100.53`}
+              strokeDasharray={`${(completionData.completionPercentage * 100.53) / 100}, 100.53`}
               strokeLinecap="round"
               className="text-emerald-600"
             />
@@ -131,7 +131,7 @@ export function ProfileCompletionFloating() {
             </span>
           </div>
         </div>
-        
+
         <div className="flex flex-col flex-1">
           <div className="text-lg font-semibold text-emerald-900">
             {completionData.completionPercentage}%
@@ -156,12 +156,7 @@ export function ProfileCompletionFloating() {
           className="ml-2 rounded-md p-1 text-emerald-400 opacity-0 transition-opacity hover:text-emerald-600 group-hover:opacity-100"
           aria-label="Dismiss"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -181,4 +176,3 @@ export function ProfileCompletionFloating() {
     </>
   )
 }
-

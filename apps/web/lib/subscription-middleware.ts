@@ -334,7 +334,7 @@ async function resetDailyUsageIfNeeded(userId: string): Promise<void> {
 
   const now = new Date()
   const lastReset = user.lastUsageReset || new Date(0)
-  
+
   // Reset if it's a new day
   const lastResetDate = new Date(lastReset)
   lastResetDate.setHours(0, 0, 0, 0)
@@ -352,12 +352,3 @@ async function resetDailyUsageIfNeeded(userId: string): Promise<void> {
     })
   }
 }
-
-
-
-
-
-
-
-
-

@@ -29,7 +29,7 @@ export default function Step2Page() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const manualSearchTimeoutRef = useRef<NodeJS.Timeout>()
   const manualDropdownRef = useRef<HTMLDivElement>(null)
-  
+
   // Pre-select nonprofit as default
   const [selectedType, setSelectedType] = useState('US Registered 501(c)(3) Nonprofit')
   const [organizationName, setOrganizationName] = useState('')
@@ -43,13 +43,13 @@ export default function Step2Page() {
     legalName?: string
     ein?: string
   } | null>(null)
-  
+
   // Manual entry search state (for non-nonprofit types)
   const [manualSearchQuery, setManualSearchQuery] = useState('')
   const [manualSearchResults, setManualSearchResults] = useState<ProPublicaResult[]>([])
   const [manualShowDropdown, setManualShowDropdown] = useState(false)
   const [manualIsSearching, setManualIsSearching] = useState(false)
-  
+
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -62,13 +62,13 @@ export default function Step2Page() {
         message: error.message,
         stack: error.stack,
         name: error.name,
-        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
       })
     } else {
       // Plain object (like API error response)
       console.error(`${context}:`, {
         errorObject: error,
-        stringified: JSON.stringify(error, null, 2)
+        stringified: JSON.stringify(error, null, 2),
       })
     }
   }
@@ -102,15 +102,17 @@ export default function Step2Page() {
     const timeoutId = setTimeout(async () => {
       setIsSearching(true)
       try {
-        const response = await fetch(`/api/onboarding/propublica?q=${encodeURIComponent(searchQuery)}`)
-        
+        const response = await fetch(
+          `/api/onboarding/propublica?q=${encodeURIComponent(searchQuery)}`,
+        )
+
         if (!response.ok) {
           console.error('ProPublica search failed:', response.status, response.statusText)
           setSearchResults([])
           setShowDropdown(false)
           return
         }
-        
+
         const data = await response.json()
         console.log('ProPublica API response:', JSON.stringify(data, null, 2))
         const organizations = data.organizations || []
@@ -154,15 +156,17 @@ export default function Step2Page() {
     const timeoutId = setTimeout(async () => {
       setManualIsSearching(true)
       try {
-        const response = await fetch(`/api/onboarding/propublica?q=${encodeURIComponent(manualSearchQuery)}`)
-        
+        const response = await fetch(
+          `/api/onboarding/propublica?q=${encodeURIComponent(manualSearchQuery)}`,
+        )
+
         if (!response.ok) {
           console.error('ProPublica search failed:', response.status, response.statusText)
           setManualSearchResults([])
           setManualShowDropdown(false)
           return
         }
-        
+
         const data = await response.json()
         const organizations = data.organizations || []
         setManualSearchResults(organizations)
@@ -305,7 +309,7 @@ export default function Step2Page() {
       })
 
       // Save the organization data
-      const saveResponse = await Promise.race([
+      const saveResponse = (await Promise.race([
         fetch('/api/onboarding/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -318,7 +322,7 @@ export default function Step2Page() {
           }),
         }),
         timeoutPromise,
-      ]) as Response
+      ])) as Response
 
       if (!saveResponse.ok) {
         const errorData = await saveResponse.json().catch(() => ({}))
@@ -330,13 +334,13 @@ export default function Step2Page() {
 
       // Verify the save was successful by checking the status API
       // Add a delay to ensure database transaction is committed
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
       // Verify the status shows basic completion before navigating
       const statusResponse = await fetch('/api/onboarding/status?t=' + Date.now(), {
         cache: 'no-store',
       })
-      
+
       if (!statusResponse.ok) {
         console.error('Failed to verify save status')
         setErrorMessage('Unable to verify your information was saved. Please try again.')
@@ -345,20 +349,22 @@ export default function Step2Page() {
       }
 
       const statusData = await statusResponse.json()
-      
+
       if (!statusData.isBasicComplete) {
         // Save might not have propagated yet, wait a bit more and retry once
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         const retryStatusResponse = await fetch('/api/onboarding/status?t=' + Date.now(), {
           cache: 'no-store',
         })
-        
+
         if (retryStatusResponse.ok) {
           const retryStatusData = await retryStatusResponse.json()
           if (!retryStatusData.isBasicComplete) {
             // Even if status check fails, proceed with bypass parameter
             // This allows database time to catch up
-            console.warn('Save verification: organizationType not yet visible, using bypass parameter')
+            console.warn(
+              'Save verification: organizationType not yet visible, using bypass parameter',
+            )
           }
         }
       }
@@ -369,7 +375,7 @@ export default function Step2Page() {
         sessionStorage.setItem('fromOnboarding', 'true')
         sessionStorage.setItem('lastRedirectTime', Date.now().toString())
       }
-      
+
       // Add query parameter to bypass OnboardingGate check temporarily
       // This gives the database time to fully commit the transaction
       window.location.href = '/app?skipOnboarding=true'
@@ -378,7 +384,7 @@ export default function Step2Page() {
       setErrorMessage(
         error instanceof Error && error.message === 'Save timeout'
           ? 'Save operation timed out. Please try again.'
-          : 'An error occurred while saving. Please try again.'
+          : 'An error occurred while saving. Please try again.',
       )
       setIsLoading(false)
     }
@@ -389,11 +395,9 @@ export default function Step2Page() {
   // Determine if Continue button should be disabled
   // For nonprofit: button is enabled if user has typed in organization name OR EIN field
   // For non-nonprofit: button is enabled if organization type is selected
-  const hasOrganizationInput = Boolean(searchQuery?.trim()) || 
-    Boolean(organizationName?.trim()) || 
-    Boolean(ein?.trim())
-  const isContinueDisabled = !selectedType || 
-    (isNonprofit && !hasOrganizationInput)
+  const hasOrganizationInput =
+    Boolean(searchQuery?.trim()) || Boolean(organizationName?.trim()) || Boolean(ein?.trim())
+  const isContinueDisabled = !selectedType || (isNonprofit && !hasOrganizationInput)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-8">
@@ -408,7 +412,7 @@ export default function Step2Page() {
 
         <div className="mb-6">
           <h2 className="mb-4 text-xl font-semibold">Step 1: Who You Are</h2>
-          
+
           {/* Primary: Organization Search (for nonprofits) */}
           {isNonprofit && (
             <div className="mb-6">
@@ -417,7 +421,8 @@ export default function Step2Page() {
               </p>
               <div className="relative">
                 <label className="mb-2 block text-base font-semibold text-gray-900">
-                  Organization Search <span className="text-sm font-normal text-gray-500">(Recommended)</span>
+                  Organization Search{' '}
+                  <span className="text-sm font-normal text-gray-500">(Recommended)</span>
                 </label>
                 <p className="mb-3 text-sm text-gray-600">
                   🔍 We'll auto-fill your details from our nonprofit database
@@ -438,7 +443,7 @@ export default function Step2Page() {
                       </span>
                     </div>
                   )}
-                  
+
                   {/* Search Dropdown */}
                   {showDropdown && searchResults.length > 0 && (
                     <div
@@ -462,7 +467,7 @@ export default function Step2Page() {
                       ))}
                     </div>
                   )}
-                  
+
                   {isSearching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       <div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
@@ -470,13 +475,16 @@ export default function Step2Page() {
                   )}
                 </div>
                 <p className="mt-2 text-xs text-gray-500">
-                  ✅ Verified organizations get better grant recommendations. Can't find your organization? No problem - enter manually below.
+                  ✅ Verified organizations get better grant recommendations. Can't find your
+                  organization? No problem - enter manually below.
                 </p>
-                
+
                 {/* Verified Organization Display */}
                 {isVerified && orgData && (
                   <div className="mt-3 rounded-lg bg-green-50 p-3">
-                    <p className="text-sm font-medium text-green-800">✓ Found: {orgData.legalName}</p>
+                    <p className="text-sm font-medium text-green-800">
+                      ✓ Found: {orgData.legalName}
+                    </p>
                     <p className="text-xs text-green-700">EIN: {orgData.ein}</p>
                   </div>
                 )}
@@ -484,9 +492,7 @@ export default function Step2Page() {
 
               {/* Fallback: EIN Search (Secondary) */}
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="mb-2 text-xs text-gray-600 text-center">
-                  OR
-                </p>
+                <p className="mb-2 text-xs text-gray-600 text-center">OR</p>
                 <h3 className="mb-2 text-sm font-medium text-gray-700">
                   Search by EIN (Alternative)
                 </h3>
@@ -539,14 +545,14 @@ export default function Step2Page() {
           {/* Manual entry for non-nonprofit types */}
           {!isNonprofit && (
             <div className="mb-6">
-              <h3 className="mb-3 text-sm font-medium text-gray-700">
-                Organization Details
-              </h3>
+              <h3 className="mb-3 text-sm font-medium text-gray-700">Organization Details</h3>
               <div className="space-y-3">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
                     Organization Name
-                    <span className="ml-2 text-xs font-normal text-gray-500">(Search our database)</span>
+                    <span className="ml-2 text-xs font-normal text-gray-500">
+                      (Search our database)
+                    </span>
                   </label>
                   <div className="relative">
                     <Input
@@ -563,7 +569,7 @@ export default function Step2Page() {
                         </span>
                       </div>
                     )}
-                    
+
                     {/* Manual Search Dropdown */}
                     {manualShowDropdown && manualSearchResults.length > 0 && (
                       <div
@@ -581,13 +587,15 @@ export default function Step2Page() {
                               EIN: {org.ein} • {org.city}, {org.state}
                             </div>
                             {org.mission && (
-                              <div className="text-xs text-gray-500 mt-1 truncate">{org.mission}</div>
+                              <div className="text-xs text-gray-500 mt-1 truncate">
+                                {org.mission}
+                              </div>
                             )}
                           </button>
                         ))}
                       </div>
                     )}
-                    
+
                     {manualIsSearching && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
                         <div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
@@ -595,16 +603,17 @@ export default function Step2Page() {
                     )}
                   </div>
                   <p className="mt-2 text-xs text-gray-500">
-                    🔍 We'll search our database to auto-fill your details. Can't find your organization? No problem - continue typing to enter manually.
+                    🔍 We'll search our database to auto-fill your details. Can't find your
+                    organization? No problem - continue typing to enter manually.
                   </p>
-                  
+
                   {/* Verified Organization Display */}
                   {isVerified && orgData && (
                     <div className="mt-3 rounded-lg bg-green-50 p-3">
-                      <p className="text-sm font-medium text-green-800">✓ Found: {orgData.legalName}</p>
-                      {orgData.ein && (
-                        <p className="text-xs text-green-700">EIN: {orgData.ein}</p>
-                      )}
+                      <p className="text-sm font-medium text-green-800">
+                        ✓ Found: {orgData.legalName}
+                      </p>
+                      {orgData.ein && <p className="text-xs text-green-700">EIN: {orgData.ein}</p>}
                     </div>
                   )}
                 </div>
@@ -640,9 +649,9 @@ export default function Step2Page() {
           >
             {isLoading ? 'Loading...' : 'Skip'}
           </button>
-          <Button 
+          <Button
             type="button"
-            onClick={handleContinue} 
+            onClick={handleContinue}
             disabled={isContinueDisabled || isLoading}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >

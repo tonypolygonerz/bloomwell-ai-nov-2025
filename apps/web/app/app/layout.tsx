@@ -28,10 +28,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen flex-col">
         <AppTopbar />
         <div className="flex flex-1">
-          <AppSidebar
-            isCollapsed={isSidebarCollapsed}
-            onToggle={handleToggleSidebar}
-          />
+          <AppSidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
           <main className="flex-1">{children}</main>
         </div>
       </div>

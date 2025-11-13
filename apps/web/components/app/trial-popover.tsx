@@ -26,12 +26,7 @@ export function TrialPopover({ isOpen, onClose, daysRemaining }: TrialPopoverPro
             className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             aria-label="Close"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -180,12 +175,7 @@ export function TrialPopover({ isOpen, onClose, daysRemaining }: TrialPopoverPro
         <div className="flex items-center justify-end border-t border-gray-200 p-6">
           <Link href="/upgrade">
             <Button className="inline-flex items-center gap-2 bg-black text-white hover:bg-gray-800">
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -201,4 +191,3 @@ export function TrialPopover({ isOpen, onClose, daysRemaining }: TrialPopoverPro
     </Dialog>
   )
 }
-

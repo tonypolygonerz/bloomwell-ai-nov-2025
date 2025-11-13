@@ -164,9 +164,7 @@ export function SubscriptionStatus() {
                 <div
                   className="h-full bg-brand transition-all"
                   style={{
-                    width: `${
-                      (usageStats.tokensUsedToday / usageStats.tokensDailyLimit) * 100
-                    }%`,
+                    width: `${(usageStats.tokensUsedToday / usageStats.tokensDailyLimit) * 100}%`,
                   }}
                 />
               </div>
@@ -176,21 +174,10 @@ export function SubscriptionStatus() {
       )}
 
       <div className="mt-4 pt-4 border-t">
-        <Link
-          href="/upgrade"
-          className="text-sm text-brand hover:underline font-semibold"
-        >
+        <Link href="/upgrade" className="text-sm text-brand hover:underline font-semibold">
           Manage Subscription →
         </Link>
       </div>
     </Card>
   )
 }
-
-
-
-
-
-
-
-

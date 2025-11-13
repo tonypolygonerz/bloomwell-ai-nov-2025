@@ -24,12 +24,13 @@ export default async function UpgradePage() {
   const subscription = await getUserSubscription(userId)
   const usageStats = await getUsageStats(userId)
 
-  const daysUntilTrialEnd = subscription.isTrialActive && subscription.currentPeriodEnd
-    ? Math.ceil(
-        (new Date(subscription.currentPeriodEnd).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24),
-      )
-    : null
+  const daysUntilTrialEnd =
+    subscription.isTrialActive && subscription.currentPeriodEnd
+      ? Math.ceil(
+          (new Date(subscription.currentPeriodEnd).getTime() - new Date().getTime()) /
+            (1000 * 60 * 60 * 24),
+        )
+      : null
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -145,9 +146,7 @@ export default async function UpgradePage() {
                   <div
                     className="h-full bg-brand transition-all"
                     style={{
-                      width: `${
-                        (usageStats.tokensUsedToday / usageStats.tokensDailyLimit) * 100
-                      }%`,
+                      width: `${(usageStats.tokensUsedToday / usageStats.tokensDailyLimit) * 100}%`,
                     }}
                   />
                 </div>
@@ -164,9 +163,7 @@ export default async function UpgradePage() {
                   <Button className="w-full">View Pricing Plans</Button>
                 </Link>
               )}
-              {subscription.status === 'active' && (
-                <PortalButton />
-              )}
+              {subscription.status === 'active' && <PortalButton />}
               <Link href="/app">
                 <Button className="w-full bg-transparent border-2 border-brand text-brand hover:bg-brand hover:text-white">
                   Back to Dashboard

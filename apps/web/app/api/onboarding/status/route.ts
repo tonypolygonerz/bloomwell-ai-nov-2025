@@ -96,10 +96,10 @@ export async function GET() {
     0,
   )
 
-  return NextResponse.json({ 
-    isComplete, 
-    isBasicComplete, 
-    isFullComplete, 
+  return NextResponse.json({
+    isComplete,
+    isBasicComplete,
+    isFullComplete,
     organization,
     completionPercentage,
     completionSteps,

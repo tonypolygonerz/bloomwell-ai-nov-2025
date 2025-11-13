@@ -13,7 +13,7 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#22C55E',
+          DEFAULT: '#00A150',
           hover: '#16A34A',
           light: '#DCFCE7',
           navy: '#1E293B',
@@ -21,6 +21,12 @@ module.exports = {
       },
       borderRadius: {
         md: '8px',
+        card: '1rem',
+        button: '0.5rem',
+      },
+      boxShadow: {
+        card: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0 4px 12px rgba(0, 161, 80, 0.15)',
       },
     },
   },

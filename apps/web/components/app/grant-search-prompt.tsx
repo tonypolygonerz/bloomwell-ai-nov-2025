@@ -17,7 +17,7 @@ export function GrantSearchPrompt({ isOpen, onClose, onComplete }: GrantSearchPr
     try {
       const response = await fetch('/api/onboarding/status')
       const data = await response.json()
-      
+
       if (!data.isBasicComplete) {
         // No organization type - go to Step 1
         router.push('/onboarding/step2')

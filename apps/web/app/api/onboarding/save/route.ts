@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     console.error('[Onboarding Save] DATABASE_URL environment variable is not set')
     return NextResponse.json(
       { error: 'Database configuration error', message: 'DATABASE_URL is not configured' },
-      { status: 503 }
+      { status: 503 },
     )
   }
 
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         message: 'Unable to connect to database. Please try again later.',
         ...(process.env.NODE_ENV === 'development' && { details: dbError?.message }),
       },
-      { status: 503 }
+      { status: 503 },
     )
   }
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     console.error('[Onboarding Save] Failed to parse request body:', parseError)
     return NextResponse.json(
       { error: 'Invalid request body', message: 'Request body must be valid JSON' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       console.error('[Onboarding Save] Zod validation error:', validationError.issues)
       return NextResponse.json(
         { error: 'Invalid input', details: validationError.issues },
-        { status: 400 }
+        { status: 400 },
       )
     }
     throw validationError
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   const { state, ...otherData } = data
   const parsedData = {
     ...otherData,
-    serviceGeo: state || data.serviceGeo // Use state if provided
+    serviceGeo: state || data.serviceGeo, // Use state if provided
   }
 
   if (session) {
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     // First try to get email from session if session exists
     if (session?.user?.email) {
       emailToUse = session.user.email
-    } 
+    }
     // Otherwise, allow email in request body for onboarding users
     else if (data.email) {
       emailToUse = data.email
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         where: { email: emailToUse },
         select: { id: true },
       })
-      
+
       // Allow if user exists (during onboarding, even if they have a password)
       if (user) {
         userId = user.id
@@ -138,13 +138,16 @@ export async function POST(request: NextRequest) {
           message: 'Failed to look up user. Please try again.',
           ...(process.env.NODE_ENV === 'development' && { details: dbError?.message }),
         },
-        { status: 503 }
+        { status: 503 },
       )
     }
   }
 
   if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized - No session or email provided' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'Unauthorized - No session or email provided' },
+      { status: 401 },
+    )
   }
 
   try {
@@ -177,14 +180,18 @@ export async function POST(request: NextRequest) {
     const organization = await prisma.organization.upsert({
       where: { userId },
       update: {
-        ...(parsedData.organizationType !== undefined && { organizationType: parsedData.organizationType }),
+        ...(parsedData.organizationType !== undefined && {
+          organizationType: parsedData.organizationType,
+        }),
         ...(parsedData.ein !== undefined && { ein: parsedData.ein ?? null }),
         ...(parsedData.legalName !== undefined && { legalName: parsedData.legalName ?? null }),
         ...(parsedData.mission !== undefined && { mission: parsedData.mission ?? null }),
         ...(parsedData.budget !== undefined && { budget: parsedData.budget ?? null }),
         ...(parsedData.staffSize !== undefined && { staffSize: parsedData.staffSize ?? null }),
         ...(parsedData.focusAreas !== undefined && { focusAreas: parsedData.focusAreas ?? null }),
-        ...(parsedData.revenueBracket !== undefined && { revenueBracket: parsedData.revenueBracket ?? null }),
+        ...(parsedData.revenueBracket !== undefined && {
+          revenueBracket: parsedData.revenueBracket ?? null,
+        }),
         ...(parsedData.serviceGeo !== undefined && { serviceGeo: parsedData.serviceGeo ?? null }),
         ...(parsedData.fiscalYear !== undefined && { fiscalYear: parsedData.fiscalYear ?? null }),
         ...(parsedData.isVerified !== undefined && { isVerified: parsedData.isVerified }),
@@ -247,7 +254,7 @@ export async function POST(request: NextRequest) {
                 details: prismaError.meta,
               }),
             },
-            { status: 409 }
+            { status: 409 },
           )
         case 'P2025':
           // Record not found
@@ -259,7 +266,7 @@ export async function POST(request: NextRequest) {
                 details: prismaError.meta,
               }),
             },
-            { status: 404 }
+            { status: 404 },
           )
         case 'P2003':
           // Foreign key constraint violation
@@ -271,7 +278,7 @@ export async function POST(request: NextRequest) {
                 details: prismaError.meta,
               }),
             },
-            { status: 400 }
+            { status: 400 },
           )
         case 'P1001':
         case 'P1002':
@@ -285,7 +292,7 @@ export async function POST(request: NextRequest) {
                 details: prismaError.message,
               }),
             },
-            { status: 503 }
+            { status: 503 },
           )
         default:
           // Other Prisma errors
@@ -298,7 +305,7 @@ export async function POST(request: NextRequest) {
                 code: prismaError.code,
               }),
             },
-            { status: 500 }
+            { status: 500 },
           )
       }
     }
@@ -327,7 +334,7 @@ export async function POST(request: NextRequest) {
           details: error instanceof Error ? error.message : String(error),
         }),
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

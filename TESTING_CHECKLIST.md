@@ -271,15 +271,12 @@ Test all 4 pricing tiers (Starter Monthly, Starter Annual, Enterprise Monthly, E
   - [ ] Attempt to access protected feature
   - [ ] Verify access is denied
   - [ ] Verify appropriate error message is shown
-  
 - [ ] Test with user with active subscription:
   - [ ] Verify access is granted
   - [ ] Verify features work correctly
-  
 - [ ] Test with user with trialing subscription:
   - [ ] Verify access is granted
   - [ ] Verify trial period is respected
-  
 - [ ] Test with user with canceled subscription:
   - [ ] Verify access is denied
   - [ ] Verify prompt to resubscribe is shown
@@ -490,23 +487,27 @@ After completing all tests:
 ## Troubleshooting Common Issues
 
 ### Checkout Not Redirecting
+
 - Check `NEXTAUTH_URL` is set correctly
 - Verify Stripe keys are valid
 - Check browser console for errors
 
 ### Webhooks Not Processing
+
 - Verify webhook secret is correct
 - Check Stripe Dashboard > Webhooks for recent events
 - Review server logs for processing errors
 - Ensure webhook endpoint URL is accessible
 
 ### Subscription Status Not Updating
+
 - Verify webhook events are being received
 - Check database for subscription records
 - Verify webhook handlers are processing correctly
 - Check for errors in server logs
 
 ### Usage Counters Not Resetting
+
 - Verify `lastUsageReset` timestamp logic
 - Check that daily reset runs at midnight
 - Verify invoice payment webhook resets monthly usage
@@ -522,4 +523,3 @@ After completing testing:
 2. Document all test results
 3. Address any issues found
 4. Proceed to production deployment with confidence
-

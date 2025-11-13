@@ -62,9 +62,7 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
   const subscriptionId =
-    typeof session.subscription === 'string'
-      ? session.subscription
-      : session.subscription?.id
+    typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
 
   if (!customerId || !subscriptionId) {
     console.error('Missing customer or subscription ID in checkout session')
@@ -178,12 +176,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const customerId =
-    typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
   const subscriptionId =
-    typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : invoice.subscription?.id
+    typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id
 
   if (!customerId || !subscriptionId) {
     return
@@ -204,11 +199,3 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     })
   }
 }
-
-
-
-
-
-
-
-

@@ -89,9 +89,9 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
   }, [])
 
   // Get unfiled chats (recent chats)
-  const recentChats = chats.filter((chat) => !chat.projectId).sort((a, b) => 
-    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  )
+  const recentChats = chats
+    .filter((chat) => !chat.projectId)
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
 
   // Create new chat
   const handleCreateChat = async () => {
@@ -111,7 +111,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
           setChats(chatsData.chats || [])
         }
         // Navigate to chat (TODO: implement chat page)
-        router.push(`/app/chat/${data.chat.id}`)
+        router.push(`/app/chat/${data.chat.id}` as any)
       }
     } catch (error) {
       console.error('Error creating chat:', error)
@@ -241,25 +241,20 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       <nav className="flex-1 space-y-2 px-4 overflow-y-auto">
-          {/* TODO: Create /app/chat/new page */}
-          {/* <Link
+        {/* TODO: Create /app/chat/new page */}
+        {/* <Link
             href="/app/chat/new"
             className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
           >
             <span>➕</span>
             <span>Start New Chat</span>
           </Link> */}
-        
+
         {/* + New Chat Button */}
         <div className="px-4 mt-4 mb-4 -ml-[17px]">
           <button
@@ -303,7 +298,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                   <div
                     key={chat.id}
                     className="group relative flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer"
-                    onClick={() => router.push(`/app/chat/${chat.id}`)}
+                    onClick={() => router.push(`/app/chat/${chat.id}` as any)}
                   >
                     <svg
                       className="w-5 h-5 text-gray-600 flex-shrink-0"
@@ -318,9 +313,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                       />
                     </svg>
-                    <span className="flex-1 truncate text-sm text-gray-700">
-                      {chat.title}
-                    </span>
+                    <span className="flex-1 truncate text-sm text-gray-700">{chat.title}</span>
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
                       <button
                         onClick={(e) => {
@@ -413,12 +406,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                 className="p-1 hover:bg-gray-200 rounded"
                 title="New project"
               >
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -475,13 +463,15 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                     {expandedProjects.has(project.id) && (
                       <div className="ml-6 mt-1 space-y-1">
                         {project.chats.length === 0 ? (
-                          <div className="px-3 py-2 text-xs text-gray-500">No chats in this project</div>
+                          <div className="px-3 py-2 text-xs text-gray-500">
+                            No chats in this project
+                          </div>
                         ) : (
                           project.chats.map((chat) => (
                             <div
                               key={chat.id}
                               className="group flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                              onClick={() => router.push(`/app/chat/${chat.id}`)}
+                              onClick={() => router.push(`/app/chat/${chat.id}` as any)}
                             >
                               <svg
                                 className="w-4 h-4 text-gray-500"
@@ -562,19 +552,21 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
             )}
           </div>
         )}
-        
+
         {/* Webinars Link */}
         <Link
           href="/webinars"
           className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
         >
           <span className="flex-shrink-0">📚</span>
-          <span className={`${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'} transition-opacity duration-300`}>
+          <span
+            className={`${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'} transition-opacity duration-300`}
+          >
             Webinars
           </span>
         </Link>
       </nav>
-      
+
       {/* Trial Banner */}
       {isTrialActive && daysRemaining > 0 && !isCollapsed && (
         <div className="mx-4 mb-2 rounded-lg bg-purple-50 p-4">
@@ -584,12 +576,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
             className="mb-3 flex items-center gap-1 text-sm text-gray-700 hover:text-purple-600"
           >
             <span>What's included?</span>
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -615,7 +602,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
           </Link>
         </div>
       )}
-      
+
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gray-300 flex-shrink-0" />

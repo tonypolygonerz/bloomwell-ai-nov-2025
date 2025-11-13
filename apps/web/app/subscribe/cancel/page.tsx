@@ -47,11 +47,3 @@ export default async function CancelPage() {
     </div>
   )
 }
-
-
-
-
-
-
-
-

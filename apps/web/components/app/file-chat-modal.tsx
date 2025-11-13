@@ -145,12 +145,7 @@ export function FileChatModal({
               onClick={() => setIsCreatingProject(true)}
               className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg text-left text-brand transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -161,9 +156,7 @@ export function FileChatModal({
               <span className="text-sm font-medium">Create new project...</span>
             </button>
 
-            {error && (
-              <p className="mt-2 text-sm text-red-600">{error}</p>
-            )}
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </>
         ) : (
           <form onSubmit={handleCreateProject}>
@@ -176,9 +169,7 @@ export function FileChatModal({
               autoFocus
               disabled={isLoading}
             />
-            {error && (
-              <p className="mb-4 text-sm text-red-600">{error}</p>
-            )}
+            {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
             <div className="flex gap-2 justify-end">
               <button
                 type="button"
@@ -206,4 +197,3 @@ export function FileChatModal({
     </Dialog>
   )
 }
-

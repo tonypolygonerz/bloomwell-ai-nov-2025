@@ -5,13 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button, Card, Input } from '@bloomwell/ui'
 import { ProgressIndicator } from '@/components/auth/progress-indicator'
 
-const budgetOptions = [
-  '<$90K',
-  '$90K-$200K',
-  '$200K-$500K',
-  '$500K-$750K',
-  '$750K-$1M',
-]
+const budgetOptions = ['<$90K', '$90K-$200K', '$200K-$500K', '$500K-$750K', '$750K-$1M']
 
 const staffSizeOptions = ['1-5', '6-10', '11-25', '26-50', '51-100', '101-500']
 
@@ -122,8 +116,9 @@ export default function Step3Page() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         logError('Failed to save organization data', errorData)
-        
-        const errorMsg = errorData.message || errorData.error || 'Unable to save your data. Please try again.'
+
+        const errorMsg =
+          errorData.message || errorData.error || 'Unable to save your data. Please try again.'
         setErrorMessage(errorMsg)
         setIsLoading(false)
         return
@@ -158,9 +153,10 @@ export default function Step3Page() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         logError('Failed to save organization data (skip)', errorData)
-        
+
         // For skip, we still navigate but show a warning
-        const errorMsg = errorData.message || errorData.error || 'Unable to save your data, but continuing...'
+        const errorMsg =
+          errorData.message || errorData.error || 'Unable to save your data, but continuing...'
         console.warn('Skip save failed:', errorMsg)
         // Still navigate on skip even if save fails
         router.push('/app')
@@ -184,7 +180,13 @@ export default function Step3Page() {
       <Card className="w-full max-w-2xl p-8">
         <ProgressIndicator currentStep={3} totalSteps={3} />
 
-        <form onSubmit={(e) => { e.preventDefault(); handleContinue(); }} className="space-y-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleContinue()
+          }}
+          className="space-y-5"
+        >
           {/* Error Message Display */}
           {errorMessage && (
             <div className="rounded-md bg-red-50 border border-red-200 p-4">
@@ -303,7 +305,13 @@ export default function Step3Page() {
               <Button
                 type="submit"
                 className="bg-[#1E6F5C] text-white font-bold hover:bg-[#1a5d4d] py-3 rounded-md px-6"
-                disabled={isLoading || !formData.mission || !formData.budget || !formData.staffSize || !formData.state}
+                disabled={
+                  isLoading ||
+                  !formData.mission ||
+                  !formData.budget ||
+                  !formData.staffSize ||
+                  !formData.state
+                }
               >
                 {isLoading ? 'Saving...' : 'Continue'}
               </Button>

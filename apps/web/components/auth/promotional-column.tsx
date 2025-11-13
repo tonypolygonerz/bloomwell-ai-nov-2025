@@ -49,7 +49,8 @@ export function PromotionalColumn() {
 
       {/* Description */}
       <p className="mb-12 text-lg text-white/90 leading-relaxed">
-        Join thousands of nonprofits discovering funding opportunities with AI-powered grant matching.
+        Join thousands of nonprofits discovering funding opportunities with AI-powered grant
+        matching.
       </p>
 
       {/* Feature Cards */}
@@ -108,6 +109,3 @@ export function PromotionalColumn() {
     </div>
   )
 }
-
-
-

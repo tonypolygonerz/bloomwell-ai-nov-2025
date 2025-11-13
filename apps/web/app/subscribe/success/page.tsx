@@ -62,11 +62,3 @@ export default async function SuccessPage() {
     </div>
   )
 }
-
-
-
-
-
-
-
-

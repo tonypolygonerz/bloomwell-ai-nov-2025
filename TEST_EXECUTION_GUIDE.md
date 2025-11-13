@@ -5,18 +5,22 @@ This guide provides step-by-step instructions for executing the comprehensive te
 ## Prerequisites
 
 1. **Development Server Running**
+
    ```bash
    cd "/Users/newberlin/Development/Bloomwell AI/Bloomwell AI Nov 2025"
    npm run dev
    ```
+
    Server should be accessible at `http://localhost:3000`
 
 2. **Dependencies Installed**
+
    ```bash
    npm install
    ```
 
 3. **Puppeteer Available** (for automated tests)
+
    ```bash
    npm install puppeteer --save-dev
    ```
@@ -34,6 +38,7 @@ node test-skip-fix-verification.js
 ```
 
 **What it tests:**
+
 - ✅ Test 1: Basic Skip Flow from Step 2
 - ✅ Test 2: Skip with Organization Type Selected
 - ✅ Test 4: OnboardingGate Retry Logic
@@ -44,6 +49,7 @@ node test-skip-fix-verification.js
 - ✅ Browser Console Verification Script
 
 **Output:**
+
 - Test results printed to console
 - Screenshots saved to `test-results-skip-fix/` directory
 - Pass/fail summary at the end
@@ -67,6 +73,7 @@ node test-skip-fix-verification.js
 9. Wait 5 seconds and verify still on `/app`
 
 **Success Criteria:**
+
 - ✅ Save API returns 200
 - ✅ Navigation to `/app` succeeds
 - ✅ No redirect loop (user stays on `/app`)
@@ -80,6 +87,7 @@ node test-skip-fix-verification.js
 5. Review the verification results
 
 **Expected Output:**
+
 ```
 🔄 Testing Skip Fix...
 ✅ Save API Success: true
@@ -136,6 +144,7 @@ npx prisma studio
 ```
 
 **Expected Database State:**
+
 - Organization record exists for the user
 - `organizationType` field is set (not null)
 - `isBasicComplete` would be `true` (has organizationType)
@@ -156,26 +165,29 @@ The fix is working correctly if:
 ### Database-Related Issues
 
 If `isBasicComplete` is still `false` after skip:
+
 ```javascript
 // Check in browser console:
 fetch('/api/onboarding/status?t=' + Date.now())
-  .then(r => r.json())
-  .then(d => console.log('DB State:', d.isBasicComplete));
+  .then((r) => r.json())
+  .then((d) => console.log('DB State:', d.isBasicComplete))
 ```
 
 ### NextAuth Integration Issues
 
 Verify session remains valid:
+
 ```javascript
 // Check session in console:
 fetch('/api/auth/session')
-  .then(r => r.json())
-  .then(s => console.log('Session:', s));
+  .then((r) => r.json())
+  .then((s) => console.log('Session:', s))
 ```
 
 ### Cache Issues
 
 If status API returns stale data:
+
 - Verify URL includes `?t=<timestamp>` query param
 - Verify `Cache-Control: no-cache` header is present
 - Try hard refresh (Ctrl+Shift+R / Cmd+Shift+R)
@@ -185,6 +197,7 @@ If status API returns stale data:
 ### Issue: Skip button doesn't navigate
 
 **Check:**
+
 1. Browser console for JavaScript errors
 2. Network tab for failed API calls
 3. Verify user is authenticated
@@ -192,6 +205,7 @@ If status API returns stale data:
 ### Issue: Redirect loop still occurs
 
 **Check:**
+
 1. SessionStorage flags (`fromOnboarding`, `lastRedirectTime`)
 2. OnboardingGate redirect attempt counter (max 2)
 3. Database state (is `organizationType` actually saved?)
@@ -199,6 +213,7 @@ If status API returns stale data:
 ### Issue: Save API returns 500 error
 
 **Check:**
+
 1. Server logs for database errors
 2. Prisma connection status
 3. Database schema matches expected structure
@@ -231,7 +246,7 @@ After executing tests, document results:
 ## Overall Status
 
 ✅ PASS - All tests passed
-⚠️  WARNINGS - Some tests have warnings
+⚠️ WARNINGS - Some tests have warnings
 ❌ FAIL - Critical tests failed
 ```
 
@@ -256,4 +271,3 @@ If the fix doesn't work completely, temporary workaround:
 ---
 
 **Note:** This is a mission-critical fix for user acquisition. All tests must pass before considering the fix complete.
-
