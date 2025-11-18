@@ -29,7 +29,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <AppTopbar />
         <div className="flex flex-1">
           <AppSidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 bg-white dark:bg-slate-900 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin">
+            {children}
+          </main>
         </div>
       </div>
     </OnboardingGate>

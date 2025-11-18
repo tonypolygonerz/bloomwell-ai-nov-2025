@@ -44,7 +44,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
   const [chats, setChats] = useState<Chat[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set(['all', 'deleted']))
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [fileModalOpen, setFileModalOpen] = useState(false)
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null)
@@ -225,16 +225,16 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
     <aside
       className={`${
         isCollapsed ? 'w-[60px]' : 'w-[280px]'
-      } relative flex flex-col border-r border-gray-200 bg-white transition-all duration-300 ease-in-out overflow-hidden`}
+      } relative flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all duration-300 ease-in-out overflow-hidden`}
     >
       {/* Toggle Button - D-shaped with blue border */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-6 z-50 w-8 h-8 rounded-lg border-2 border-blue-500 bg-white shadow-sm hover:shadow-md hover:border-blue-600 transition-all duration-200 flex items-center justify-center"
+        className="absolute -right-3 top-6 z-50 w-8 h-8 rounded-lg border-2 border-blue-500 dark:border-blue-400 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md hover:border-blue-600 dark:hover:border-blue-300 transition-all duration-200 flex items-center justify-center"
         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         <svg
-          className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
+          className={`w-4 h-4 text-slate-600 dark:text-slate-300 transition-transform duration-200 ${
             isCollapsed ? 'rotate-180' : ''
           }`}
           fill="none"
@@ -249,7 +249,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         {/* TODO: Create /app/chat/new page */}
         {/* <Link
             href="/app/chat/new"
-            className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
+            className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <span>➕</span>
             <span>Start New Chat</span>
@@ -259,7 +259,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         <div className="px-4 mt-4 mb-4 -ml-[17px]">
           <button
             onClick={handleCreateChat}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-center gap-2'} px-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-center gap-2'} px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-medium transition-all duration-200 shadow-sm hover:shadow-md`}
             aria-label="New Chat"
           >
             <svg
@@ -280,28 +280,28 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         </div>
 
         {/* Divider */}
-        <div className="my-2 border-t border-gray-200"></div>
+        <div className="my-2 border-t border-slate-200 dark:border-slate-700"></div>
 
         {/* Recent Chats Section */}
         {!isCollapsed && (
           <div className="mt-6">
-            <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase">
+            <div className="px-3 mb-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Recent Chats
             </div>
             {isLoading ? (
-              <div className="px-3 py-2 text-sm text-gray-500">Loading...</div>
+              <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">Loading...</div>
             ) : recentChats.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-gray-500">No chats yet</div>
+              <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 italic">No chats yet</div>
             ) : (
               <div className="space-y-1">
                 {recentChats.map((chat) => (
                   <div
                     key={chat.id}
-                    className="group relative flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer"
+                    className="group relative flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors duration-150"
                     onClick={() => router.push(`/app/chat/${chat.id}` as any)}
                   >
                     <svg
-                      className="w-5 h-5 text-gray-600 flex-shrink-0"
+                      className="w-5 h-5 text-slate-600 dark:text-slate-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -313,19 +313,19 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                       />
                     </svg>
-                    <span className="flex-1 truncate text-sm text-gray-700">{chat.title}</span>
-                    <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                    <span className="flex-1 truncate text-sm text-slate-700 dark:text-slate-300">{chat.title}</span>
+                    <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity duration-150">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           setSelectedChat(chat)
                           setRenameModalOpen(true)
                         }}
-                        className="p-1 hover:bg-gray-200 rounded"
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         title="Rename"
                       >
                         <svg
-                          className="w-3 h-3 text-gray-600"
+                          className="w-3 h-3 text-slate-600 dark:text-slate-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -344,11 +344,11 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                           setSelectedChat(chat)
                           setFileModalOpen(true)
                         }}
-                        className="p-1 hover:bg-gray-200 rounded"
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         title="File to project"
                       >
                         <svg
-                          className="w-3 h-3 text-gray-600"
+                          className="w-3 h-3 text-slate-600 dark:text-slate-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -366,7 +366,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                           e.stopPropagation()
                           handleDeleteChat(chat.id)
                         }}
-                        className="p-1 hover:bg-red-100 rounded text-red-600"
+                        className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg text-red-600 dark:text-red-400 transition-colors"
                         title="Delete"
                       >
                         <svg
@@ -394,7 +394,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         {/* Projects Section */}
         {!isCollapsed && (
           <div className="mt-6">
-            <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase flex items-center justify-between">
+            <div className="px-3 mb-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span>Projects</span>
               <button
                 onClick={() => {
@@ -403,7 +403,7 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                     handleCreateProject(name)
                   }
                 }}
-                className="p-1 hover:bg-gray-200 rounded"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 title="New project"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,19 +417,39 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
               </button>
             </div>
             {isLoading ? (
-              <div className="px-3 py-2 text-sm text-gray-500">Loading...</div>
-            ) : projects.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-gray-500">No projects yet</div>
+              <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">Loading...</div>
             ) : (
               <div className="space-y-1">
-                {projects.map((project) => (
+                {/* All and Deleted options */}
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-left text-sm text-slate-700 dark:text-slate-300 transition-colors duration-150"
+                  onClick={() => {/* Navigate to all chats */}}
+                >
+                  <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                  <span>All</span>
+                </button>
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-left text-sm text-slate-700 dark:text-slate-300 transition-colors duration-150"
+                  onClick={() => {/* Navigate to deleted chats */}}
+                >
+                  <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Deleted</span>
+                </button>
+                {projects.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 italic">No projects yet</div>
+                ) : (
+                  projects.map((project) => (
                   <div key={project.id} className="mb-2">
                     <button
                       onClick={() => toggleProject(project.id)}
-                      className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-left transition-colors duration-150"
                     >
                       <svg
-                        className="w-5 h-5 text-gray-600 flex-shrink-0"
+                        className="w-5 h-5 text-slate-600 dark:text-slate-400 flex-shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -441,11 +461,11 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                           d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
                         />
                       </svg>
-                      <span className="flex-1 truncate text-sm font-medium text-gray-700">
+                      <span className="flex-1 truncate text-sm font-medium text-slate-700 dark:text-slate-300">
                         {project.name}
                       </span>
                       <svg
-                        className={`w-4 h-4 text-gray-500 transition-transform ${
+                        className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform ${
                           expandedProjects.has(project.id) ? 'rotate-90' : ''
                         }`}
                         fill="none"
@@ -461,20 +481,20 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                       </svg>
                     </button>
                     {expandedProjects.has(project.id) && (
-                      <div className="ml-6 mt-1 space-y-1">
+                      <div className="ml-6 mt-1 space-y-1 border-l border-slate-200 dark:border-slate-700 pl-2">
                         {project.chats.length === 0 ? (
-                          <div className="px-3 py-2 text-xs text-gray-500">
+                          <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 italic">
                             No chats in this project
                           </div>
                         ) : (
                           project.chats.map((chat) => (
                             <div
                               key={chat.id}
-                              className="group flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                              className="group flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors duration-150"
                               onClick={() => router.push(`/app/chat/${chat.id}` as any)}
                             >
                               <svg
-                                className="w-4 h-4 text-gray-500"
+                                className="w-4 h-4 text-slate-500 dark:text-slate-400"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -486,10 +506,10 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                                   d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                                 />
                               </svg>
-                              <span className="flex-1 truncate text-sm text-gray-600">
+                              <span className="flex-1 truncate text-sm text-slate-600 dark:text-slate-400">
                                 {chat.title}
                               </span>
-                              <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                              <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity duration-150">
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation()
@@ -499,10 +519,10 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                                       setRenameModalOpen(true)
                                     }
                                   }}
-                                  className="p-1 hover:bg-gray-200 rounded"
+                                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                                 >
                                   <svg
-                                    className="w-3 h-3 text-gray-600"
+                                    className="w-3 h-3 text-slate-600 dark:text-slate-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -523,11 +543,11 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                                       handleFileToProject(chat.id, null)
                                     }
                                   }}
-                                  className="p-1 hover:bg-gray-200 rounded"
+                                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                                   title="Unfile"
                                 >
                                   <svg
-                                    className="w-3 h-3 text-gray-600"
+                                    className="w-3 h-3 text-slate-600 dark:text-slate-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -547,7 +567,8 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
                       </div>
                     )}
                   </div>
-                ))}
+                ))
+                )}
               </div>
             )}
           </div>
@@ -556,11 +577,23 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         {/* Webinars Link */}
         <Link
           href="/webinars"
-          className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors duration-150"
         >
-          <span className="flex-shrink-0">📚</span>
+          <svg
+            className="w-5 h-5 flex-shrink-0 text-slate-600 dark:text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
+          </svg>
           <span
-            className={`${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'} transition-opacity duration-300`}
+            className={`${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'} transition-opacity duration-300 text-sm`}
           >
             Webinars
           </span>
@@ -569,11 +602,11 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
 
       {/* Trial Banner */}
       {isTrialActive && daysRemaining > 0 && !isCollapsed && (
-        <div className="mx-4 mb-2 rounded-lg bg-purple-50 p-4">
-          <h3 className="mb-2 text-sm font-semibold text-gray-900">Free trial of Max features</h3>
+        <div className="mx-4 mt-4 mb-2 rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 p-4 shadow-sm">
+          <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">Free trial of Max features</h3>
           <button
             onClick={() => setShowTrialPopover(true)}
-            className="mb-3 flex items-center gap-1 text-sm text-gray-700 hover:text-purple-600"
+            className="mb-3 flex items-center gap-1 text-sm text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
           >
             <span>What's included?</span>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -586,30 +619,32 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
             </svg>
           </button>
           {/* Progress Bar */}
-          <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-purple-200">
+          <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-purple-200 dark:bg-purple-800">
             <div
-              className="h-full bg-purple-600 transition-all duration-300"
+              className="h-full bg-purple-600 dark:bg-purple-500 transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
-          <p className="mb-3 text-xs text-gray-600">
+          <p className="mb-3 text-xs text-slate-600 dark:text-slate-400">
             On day {currentDay} of {totalTrialDays} days
           </p>
           <Link href="/upgrade" className="block">
-            <button className="w-full rounded-md bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700 transition-colors">
+            <button className="w-full rounded-lg bg-purple-600 dark:bg-purple-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors shadow-sm">
               Upgrade to continue accessing all features
             </button>
           </Link>
         </div>
       )}
 
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-slate-200 dark:border-slate-700 p-4">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gray-300 flex-shrink-0" />
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">
+            {session?.user?.name?.charAt(0) ?? 'U'}
+          </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{session?.user?.name ?? 'User'}</p>
-              <p className="text-xs text-gray-600 truncate">{session?.user?.email}</p>
+              <p className="text-sm font-medium truncate text-slate-900 dark:text-white">{session?.user?.name ?? 'User'}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{session?.user?.email}</p>
             </div>
           )}
         </div>
