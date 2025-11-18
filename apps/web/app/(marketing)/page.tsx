@@ -330,56 +330,88 @@ export default function HomePage() {
               </div>
 
               {/* Right: Comparison table */}
-              <div className="rounded-card bg-white p-8 shadow-card">
-                <h3 className="text-2xl font-bold mb-3">{comparisonTable.title}</h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">{comparisonTable.subtitle}</p>
+              <div>
+                <h3 className="text-2xl font-bold mb-3 text-gray-900">{comparisonTable.title}</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">
+                  Traditional grant consultants cost{' '}
+                  <strong className="font-semibold">$150-500/hour</strong> and platforms like
+                  Instrumentl charge <strong className="font-semibold">$179-899/month</strong>. Get
+                  better results for a fraction of the cost.
+                </p>
 
-                <div className="overflow-x-auto mb-8">
-                  <table className="w-full text-sm">
+                <div className="mb-8 overflow-hidden rounded-lg border border-gray-200">
+                  <table className="w-full">
                     <thead>
-                      <tr className="border-b-2 border-gray-200">
-                        <th className="text-left py-3 pr-4 font-semibold">Solution</th>
-                        {comparisonTable.columns.map((col, i) => (
-                          <th
-                            key={i}
-                            className={`text-left py-3 px-2 font-semibold ${
-                              col.highlight ? 'text-brand' : 'text-gray-700'
-                            }`}
-                          >
-                            {col.name}
-                          </th>
-                        ))}
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                          Solution
+                        </th>
+                        <th className="text-right py-4 px-4 font-semibold text-gray-700">
+                          Monthly Cost
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-100">
-                        <td className="py-3 pr-4 font-medium text-gray-700">Monthly Cost</td>
-                        {comparisonTable.columns.map((col, i) => (
+                      {comparisonTable.rows.map((row, i) => (
+                        <tr
+                          key={i}
+                          className={`border-b border-gray-100 last:border-b-0 ${
+                            row.highlight ? 'bg-brand/10' : 'bg-white'
+                          }`}
+                        >
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`font-medium ${
+                                  row.highlight ? 'text-gray-900' : 'text-gray-700'
+                                }`}
+                              >
+                                {row.name}
+                              </span>
+                              {row.highlight && (
+                                <span className="bg-brand text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+                                  YOU
+                                </span>
+                              )}
+                            </div>
+                          </td>
                           <td
-                            key={i}
-                            className={`py-3 px-2 ${
-                              col.highlight ? 'text-brand font-bold' : 'text-gray-600'
+                            className={`py-4 px-4 text-right font-medium ${
+                              row.highlight ? 'text-brand font-bold' : 'text-gray-600'
                             }`}
                           >
-                            {col.price}
+                            {row.price}
                           </td>
-                        ))}
-                      </tr>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div className="rounded-lg bg-brand/10 p-6 flex items-center gap-4">
-                  <CurrencyDollarIcon className="w-10 h-10 text-brand flex-shrink-0" />
+                {/* Savings Callout */}
+                <div className="rounded-lg bg-brand p-6 mb-8 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <CurrencyDollarIcon className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <div className="text-sm text-gray-700 mb-1">
+                    <div className="text-xl font-bold text-white mb-1">
                       Save {comparisonTable.savings.amount} {comparisonTable.savings.period}
                     </div>
-                    <div className="font-semibold text-gray-900">
+                    <div className="text-sm text-white/90">
                       {comparisonTable.savings.description}
                     </div>
                   </div>
                 </div>
+
+                {/* Features List */}
+                <ul className="space-y-3">
+                  {comparisonTable.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <CheckIcon className="w-5 h-5 text-brand flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 

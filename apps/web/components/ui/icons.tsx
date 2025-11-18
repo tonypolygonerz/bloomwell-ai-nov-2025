@@ -160,3 +160,73 @@ export const ChevronDownIcon = ({ className = 'w-5 h-5' }: { className?: string 
     />
   </svg>
 )
+
+export const ShieldCheckIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    className={className}
+  >
+    <path
+      d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.75.75 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08z"
+      fill="currentColor"
+    />
+    <path
+      fillRule="evenodd"
+      d="M15.61 10.186a.75.75 0 10-1.22-.872l-3.236 4.53-1.366-1.366a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.137-.089l4-5.5z"
+      clipRule="evenodd"
+      fill="white"
+    />
+  </svg>
+)
+
+export const LockIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path
+      fillRule="evenodd"
+      d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
+      clipRule="evenodd"
+    />
+  </svg>
+)
+
+export const CircleCheckIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    className={className}
+  >
+    <circle cx="12" cy="12" r="10" fill="currentColor" />
+    <path
+      fillRule="evenodd"
+      d="M15.61 10.186a.75.75 0 10-1.22-.872l-3.236 4.53-1.366-1.366a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.137-.089l4-5.5z"
+      clipRule="evenodd"
+      fill="white"
+    />
+  </svg>
+)
+
+export const UptimeIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    className={className}
+  >
+    <path
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+      fill="currentColor"
+    />
+    <path
+      d="M10 17l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+      fill="white"
+    />
+  </svg>
+)

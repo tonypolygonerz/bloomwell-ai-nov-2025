@@ -8,6 +8,7 @@ import { PromotionalColumn } from '@/components/auth/promotional-column'
 import { ProgressIndicator } from '@/components/auth/progress-indicator'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
+type RegistrationStep = 'form' | 'verification'
 
 interface FieldErrors {
   firstName?: string
@@ -27,6 +28,11 @@ interface FieldTouched {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>('form')
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', ''])
+  const [verificationError, setVerificationError] = useState('')
+  const [resendCooldown, setResendCooldown] = useState(0)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -50,6 +56,11 @@ export default function RegisterPage() {
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength | null>(null)
   const [focusedField, setFocusedField] = useState<keyof typeof formData | null>(null)
 
+  // Ensure component is mounted (client-side only)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // Update OAuth visibility based on form data
   // Show OAuth when all 4 main fields (firstName, lastName, email, password) are empty
   // Hide OAuth when any field has a value
@@ -60,6 +71,14 @@ export default function RegisterPage() {
     // Show OAuth immediately when all 4 fields are empty (regardless of focus state)
     setIsOAuthVisible(!hasFieldValues)
   }, [formData])
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [resendCooldown])
 
   // Calculate password strength
   const calculatePasswordStrength = useCallback((password: string): PasswordStrength | null => {
@@ -204,26 +223,119 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const name = `${formData.firstName} ${formData.lastName}`.trim()
-      const response = await fetch('/api/auth/register', {
+      // Send verification code to email
+      const response = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setFormError(data.error || 'Failed to send verification code. Please try again.')
+        setIsLoading(false)
+        return
+      }
+
+      // Move to verification step
+      setCurrentStep('verification')
+      setResendCooldown(60) // 60 second cooldown
+      setIsLoading(false)
+    } catch (err) {
+      setFormError('An error occurred. Please try again.')
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return
+
+    setVerificationError('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setVerificationError(data.error || 'Failed to resend code')
+        setIsLoading(false)
+        return
+      }
+
+      setResendCooldown(60)
+      setIsLoading(false)
+    } catch (err) {
+      setVerificationError('Failed to resend code')
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerificationCodeChange = (index: number, value: string) => {
+    if (value.length > 1) {
+      value = value[0]
+    }
+    if (value && !/^\d$/.test(value)) {
+      return
+    }
+
+    const newCode = [...verificationCode]
+    newCode[index] = value
+    setVerificationCode(newCode)
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`code-${index + 1}`)
+      nextInput?.focus()
+    }
+
+    // Auto-submit when all digits are filled
+    if (newCode.every((digit) => digit.length === 1)) {
+      handleVerifyCode(newCode.join(''))
+    }
+  }
+
+  const handleVerificationCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      const prevInput = document.getElementById(`code-${index - 1}`)
+      prevInput?.focus()
+    }
+  }
+
+  const handleVerifyCode = async (code: string) => {
+    setVerificationError('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
           email: formData.email,
+          code,
           password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          isRegistration: true,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setFormError(data.error || 'Registration failed. Please try again.')
+        setVerificationError(data.error || 'Invalid verification code')
+        setVerificationCode(['', '', '', '', '', ''])
         setIsLoading(false)
         return
       }
 
-      // Sign in the user after successful registration
+      // Account created! Now sign in
       const signInResult = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -231,15 +343,15 @@ export default function RegisterPage() {
       })
 
       if (signInResult?.error) {
-        setFormError('Account created but sign-in failed. Please try logging in.')
+        setVerificationError('Account created but sign-in failed. Please try logging in.')
         setIsLoading(false)
         return
       }
 
-      // Redirect to onboarding step 1
+      // Redirect to onboarding
       router.push('/onboarding/step2')
     } catch (err) {
-      setFormError('An error occurred. Please try again.')
+      setVerificationError('Verification failed. Please try again.')
       setIsLoading(false)
     }
   }
@@ -266,6 +378,135 @@ export default function RegisterPage() {
     return fieldTouched[name] && !!fieldErrors[name]
   }
 
+  // Prevent hydration mismatch - wait for client-side mount
+  if (!mounted) {
+    return null
+  }
+
+  // Render verification step
+  if (currentStep === 'verification') {
+    return (
+      <div className="flex min-h-screen">
+        {/* Left Column - Promotional */}
+        <div className="hidden lg:block lg:w-1/2">
+          <PromotionalColumn />
+        </div>
+
+        {/* Right Column - Verification */}
+        <div className="flex w-full items-center justify-center bg-white px-6 py-12 lg:w-1/2">
+          <div className="w-full max-w-md">
+            <h1 className="mb-2 text-[32px] font-bold leading-tight text-gray-900 lg:text-[36px]">
+              Check your email
+            </h1>
+            <p className="mb-6 text-base text-gray-600">
+              We've sent a 6-digit verification code to{' '}
+              <span className="font-semibold text-gray-900">{formData.email}</span>
+            </p>
+
+            <ProgressIndicator currentStep={2} totalSteps={4} />
+
+            {verificationError && (
+              <div
+                className="mb-6 rounded-md border border-red-200 bg-red-50 p-3 flex items-start gap-2"
+                role="alert"
+              >
+                <svg
+                  className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p className="text-sm text-red-800">{verificationError}</p>
+              </div>
+            )}
+
+            <div className="mb-6">
+              <label className="mb-4 block text-sm font-semibold text-gray-700 text-center">
+                Enter verification code
+              </label>
+              <div className="flex gap-2 justify-center">
+                {verificationCode.map((digit, index) => (
+                  <input
+                    key={index}
+                    id={`code-${index}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleVerificationCodeChange(index, e.target.value)}
+                    onKeyDown={(e) => handleVerificationCodeKeyDown(index, e)}
+                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:border-[#1E6F5C] focus:ring-2 focus:ring-[#1E6F5C]/20 focus:outline-none transition-colors"
+                    disabled={isLoading}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center mb-6">
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={resendCooldown > 0 || isLoading}
+                className="text-sm text-[#1E6F5C] hover:text-[#1a5d4d] font-semibold disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#1E6F5C]/20 focus:ring-offset-1 rounded"
+              >
+                {resendCooldown > 0
+                  ? `Resend code in ${resendCooldown}s`
+                  : 'Resend verification code'}
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentStep('form')
+                setVerificationError('')
+                setVerificationCode(['', '', '', '', '', ''])
+              }}
+              className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#1E6F5C]/20 focus:ring-offset-1 rounded"
+            >
+              ← Back to registration form
+            </button>
+
+            {isLoading && (
+              <div className="mt-6 text-center">
+                <div className="inline-flex items-center gap-2 text-gray-600">
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Verifying code...
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Promotional */}
@@ -283,7 +524,7 @@ export default function RegisterPage() {
             Start discovering grants in under 2 minutes
           </p>
 
-          <ProgressIndicator currentStep={1} totalSteps={3} />
+          <ProgressIndicator currentStep={1} totalSteps={4} />
 
           {isOAuthVisible && (
             <div className="mb-6 space-y-3">

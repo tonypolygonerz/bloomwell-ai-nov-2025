@@ -1,6 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import {
+  ShieldCheckIcon,
+  LockIcon,
+  CircleCheckIcon,
+  UptimeIcon,
+} from '@/components/ui/icons'
 
 export function MarketingFooter() {
   return (
@@ -130,6 +136,28 @@ export function MarketingFooter() {
                 </Link>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Trust Features */}
+        <div className="mb-8 pt-8 border-t border-white/10">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-center items-center">
+            <div className="flex items-center gap-3">
+              <ShieldCheckIcon className="w-6 h-6 text-brand flex-shrink-0" />
+              <span className="text-sm text-gray-400">SOC 2 Compliant</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <LockIcon className="w-6 h-6 text-brand flex-shrink-0" />
+              <span className="text-sm text-gray-400">256-bit SSL</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CircleCheckIcon className="w-6 h-6 text-brand flex-shrink-0" />
+              <span className="text-sm text-gray-400">GDPR Ready</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <UptimeIcon className="w-6 h-6 text-brand flex-shrink-0" />
+              <span className="text-sm text-gray-400">99.9% Uptime</span>
+            </div>
           </div>
         </div>
 

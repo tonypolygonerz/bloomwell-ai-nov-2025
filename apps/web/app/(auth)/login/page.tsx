@@ -1,19 +1,26 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button, Input } from '@bloomwell/ui'
 import { LoginPromotionalColumn } from '@/components/auth/login-promotional-column'
+import { isAdminEmail } from '@bloomwell/auth/lib/constants'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/app'
+  const [mounted, setMounted] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isOAuthVisible, setIsOAuthVisible] = useState(true)
+
+  // Ensure component is mounted (client-side only)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,8 +33,16 @@ function LoginForm() {
     if (result?.error) {
       setError('Invalid email or password')
     } else {
-      router.push(callbackUrl as any)
+      // Check if user is admin and redirect accordingly
+      const isAdmin = isAdminEmail(email)
+      const redirectUrl = isAdmin ? '/admin' : callbackUrl
+      router.push(redirectUrl as any)
     }
+  }
+
+  // Prevent hydration mismatch - wait for client-side mount
+  if (!mounted) {
+    return null
   }
 
   return (

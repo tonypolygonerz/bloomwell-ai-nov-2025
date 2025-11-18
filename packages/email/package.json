@@ -1,17 +1,14 @@
 {
-  "name": "@bloomwell/stripe",
+  "name": "@bloomwell/email",
   "version": "0.1.0",
   "private": true,
   "main": "index.ts",
   "types": "index.ts",
   "dependencies": {
-    "stripe": "^17.3.1",
-    "@bloomwell/db": "*"
+    "resend": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30"
   }
 }
-
-
 

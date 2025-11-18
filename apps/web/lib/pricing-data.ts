@@ -74,17 +74,22 @@ export const comparisonTable = {
   title: 'Why nonprofits choose Bloomwell AI',
   subtitle:
     'Traditional grant consultants cost $150-500/hour and platforms like Instrumentl charge $179-899/month. Get better results for a fraction of the cost.',
-  columns: [
-    { name: 'Bloomwell AI Enterprise', price: '$29.99', highlight: true },
-    { name: 'Instrumentl', price: '$179-$299' },
-    { name: 'Grant Consultant', price: '$250-$2,000' },
-    { name: 'GrantStation', price: '$99' },
+  rows: [
+    { name: 'Bloomwell AI', price: '$29.99', highlight: true },
+    { name: 'Instrumentl', price: '$179-899' },
+    { name: 'Grant Consultant', price: '$600-2,000' },
+    { name: 'Manual Research', price: '15+ hrs/week' },
   ],
   savings: {
     amount: '$5,000+',
     period: 'per year',
-    description: 'compared to traditional methods.',
+    description: 'compared to traditional solutions',
   },
+  features: [
+    'Instant Access: Start searching grants in under 2 minutes',
+    'Scale With You: Perfect for nonprofits of any size',
+    'Always Improving: New features and grants added regularly',
+  ],
 }
 
 export const pricingDisplay = {

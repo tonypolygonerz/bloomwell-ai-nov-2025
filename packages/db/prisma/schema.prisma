@@ -13,7 +13,10 @@ model User {
   emailVerified  DateTime?
   hashedPassword String?
   name           String?
+  firstName      String?
+  lastName       String?
   image          String?
+  isAdmin        Boolean  @default(false)
   trialStartedAt DateTime?
   trialEndsAt    DateTime?
   role           Role     @default(USER)
@@ -23,18 +26,26 @@ model User {
   accounts       Account[]
   sessions       Session[]
   profileMetadata Json?
-  
+
+  // Verification fields
+  verificationCode      String?
+  verificationExpires   DateTime?
+
   // Stripe subscription fields
   stripeCustomerId     String?
   stripeSubscriptionId String?
   subscriptionStatus   String?  // active, canceled, trialing, past_due, incomplete
   currentPriceId       String?
-  
+
   // Usage tracking
   documentsUsedToday   Int      @default(0)
   documentsUsedMonth   Int      @default(0)
   tokensUsedToday      Int      @default(0)
   lastUsageReset       DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Organization {
