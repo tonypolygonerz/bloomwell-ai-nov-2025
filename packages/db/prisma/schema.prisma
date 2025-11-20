@@ -26,6 +26,8 @@ model User {
   accounts       Account[]
   sessions       Session[]
   profileMetadata Json?
+  webinarRSVPs   WebinarRSVP[]
+  preferences    UserPreferences?
 
   // Verification fields
   verificationCode      String?
@@ -63,6 +65,19 @@ model Organization {
   serviceGeo     String?
   fiscalYear     String?
   isVerified     Boolean @default(false)
+}
+
+model UserPreferences {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  timezone       String   @default("America/Los_Angeles")
+  emailReminders Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
 }
 
 model Chat {
@@ -129,13 +144,18 @@ model Webinar {
 }
 
 model WebinarRSVP {
-  id        String   @id @default(cuid())
-  webinar   Webinar  @relation(fields: [webinarId], references: [id])
-  webinarId String
-  name      String
-  email     String
-  org       String?
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  webinarId    String
+  status       String   // REGISTERED, ATTENDED, NO_SHOW
+  registeredAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webinar Webinar @relation(fields: [webinarId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, webinarId])
+  @@map("webinar_rsvps")
 }
 
 model WebinarRegistration {

@@ -8,19 +8,13 @@ export function MarketingHeader() {
         {/* Logo + Brand Name */}
         <Link href="/" className="flex items-center gap-3">
           {/* Logo: Green square with lightning bolt */}
-          <div
-            className="relative h-8 w-8 rounded-lg flex items-center justify-center shadow-sm overflow-hidden"
-            style={{
-              background: 'linear-gradient(to bottom right, #16A34A, #00A150)',
-            }}
-          >
+          <div className="relative h-8 w-8 rounded-md bg-brand flex items-center justify-center shadow-sm">
             <svg
-              width="18"
-              height="18"
+              width="14"
+              height="14"
               viewBox="0 0 14 14"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="drop-shadow-[1px_1px_2px_rgba(0,0,0,0.2)]"
             >
               <path d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z" fill="white" />
             </svg>

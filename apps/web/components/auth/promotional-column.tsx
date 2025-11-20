@@ -1,29 +1,6 @@
-import { DollarSign, Sparkles, Clock, Users, Check } from 'lucide-react'
+'use client'
 
 export function PromotionalColumn() {
-  const features = [
-    {
-      icon: DollarSign,
-      title: '1,200+ Grant Opportunities',
-      description: 'Access federal and state grants worth billions in funding.',
-    },
-    {
-      icon: Sparkles,
-      title: 'AI-Powered Matching',
-      description: 'Get personalized grant recommendations based on your mission.',
-    },
-    {
-      icon: Clock,
-      title: 'Save Hours Every Week',
-      description: 'Let AI handle research while you focus on writing proposals.',
-    },
-    {
-      icon: Users,
-      title: 'Built for Nonprofits',
-      description: 'Designed specifically for organizations under $3M budget.',
-    },
-  ]
-
   return (
     <div className="flex min-h-screen flex-col bg-[#1E6F5C] px-12 py-10 text-white lg:px-16">
       {/* Logo and Brand Name */}
@@ -36,7 +13,14 @@ export function PromotionalColumn() {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z" fill="white" />
+            <g fill="white">
+              <ellipse cx="7" cy="3.5" rx="1.2" ry="2" />
+              <ellipse cx="10.1" cy="5.1" rx="1.2" ry="2" transform="rotate(72 7 7)" />
+              <ellipse cx="10.1" cy="8.9" rx="1.2" ry="2" transform="rotate(144 7 7)" />
+              <ellipse cx="7" cy="10.5" rx="1.2" ry="2" transform="rotate(216 7 7)" />
+              <ellipse cx="3.9" cy="8.9" rx="1.2" ry="2" transform="rotate(288 7 7)" />
+              <circle cx="7" cy="7" r="1.2" />
+            </g>
           </svg>
         </div>
         <span className="text-xl font-bold">Bloomwell AI</span>
@@ -47,64 +31,44 @@ export function PromotionalColumn() {
         Start your 14-day free trial
       </h1>
 
-      {/* Description */}
-      <p className="mb-12 text-lg text-white/90 leading-relaxed">
-        Join thousands of nonprofits discovering funding opportunities with AI-powered grant
-        matching.
+      {/* Subheading */}
+      <p className="mb-12 text-lg text-white/90">
+        Join hundreds of nonprofits using AI to discover grants faster and secure more funding.
       </p>
 
-      {/* Feature Cards */}
-      <div className="mb-12 space-y-6">
-        {features.map((feature, index) => {
-          const Icon = feature.icon
-          return (
-            <div key={index} className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#4CAF50]">
-                <Icon className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="mb-1 text-xl font-bold">{feature.title}</h3>
-                <p className="text-base text-white/90">{feature.description}</p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Testimonial Box */}
-      <div className="mb-12 rounded-lg bg-[#4CAF50]/30 p-6 backdrop-blur-sm">
-        <div className="mb-3 flex items-center gap-2">
-          <div className="flex -space-x-2">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="h-8 w-8 rounded-full bg-[#4CAF50] border-2 border-[#4CAF50]"
+      {/* Feature List */}
+      <div className="mb-12 space-y-4">
+        {[
+          'Access 73,000+ federal grants',
+          'AI-powered grant matching',
+          'Expert guidance and support',
+          'Cancel anytime',
+        ].map((feature, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <svg
+              className="h-5 w-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
               />
-            ))}
+            </svg>
+            <span className="text-lg">{feature}</span>
           </div>
-          <span className="text-sm font-bold text-white">2,000+ nonprofits</span>
-        </div>
-        <blockquote className="mb-3 text-base text-white/90 leading-relaxed">
-          &quot;Bloomwell AI helped us discover $500K in grants we didn&apos;t know existed. The AI
-          assistant feels like having a dedicated grant researcher.&quot;
-        </blockquote>
-        <p className="text-sm text-white/90">— Sarah M., Executive Director</p>
+        ))}
       </div>
 
-      {/* Footer Badges */}
-      <div className="mt-auto flex flex-wrap gap-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#4CAF50]">
-            <Check className="h-3 w-3 text-white" />
-          </div>
-          <span className="text-sm text-white/90">No credit card required</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#4CAF50]">
-            <Check className="h-3 w-3 text-white" />
-          </div>
-          <span className="text-sm text-white/90">Cancel anytime</span>
-        </div>
+      {/* Testimonial */}
+      <div className="mt-auto">
+        <blockquote className="mb-4 text-xl italic text-white/90">
+          &quot;We found three perfect grant opportunities in our first week. This tool is a game-changer.&quot;
+        </blockquote>
+        <p className="text-sm text-white/70">— Michael Chen, Executive Director</p>
       </div>
     </div>
   )

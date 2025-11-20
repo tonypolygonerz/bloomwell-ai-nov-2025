@@ -14,6 +14,17 @@ export const authOptions: NextAuthOptions = {
   // Allow linking OAuth accounts to existing email/password accounts
   // This is safe because we enforce email verification for all auth methods
   allowDangerousEmailAccountLinking: true,
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
@@ -208,11 +219,25 @@ export const authOptions: NextAuthOptions = {
             console.log('❌ Blocking unverified OAuth user:', user.email)
             return false // This will redirect to sign-in page with error
           }
+
+          // Ensure existing user has an organization
+          const existingOrg = await prisma.organization.findUnique({
+            where: { userId: dbUser.id },
+          })
+          if (!existingOrg) {
+            await prisma.organization.create({
+              data: {
+                userId: dbUser.id,
+                name: dbUser.name || dbUser.email!,
+              },
+            })
+            console.log('✅ Organization created for existing OAuth user')
+          }
         } else {
           // New OAuth user - auto-verify and set admin status
           const isAdmin = isAdminEmail(user.email)
           const nameParts = user.name?.split(' ') || []
-          await prisma.user.create({
+          const newUser = await prisma.user.create({
             data: {
               email: user.email!,
               name: user.name,
@@ -227,6 +252,15 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             isAdmin,
           })
+
+          // Create empty organization for new OAuth user
+          await prisma.organization.create({
+            data: {
+              userId: newUser.id,
+              name: user.name || user.email!,
+            },
+          })
+          console.log('✅ Organization created for new OAuth user')
         }
       }
 

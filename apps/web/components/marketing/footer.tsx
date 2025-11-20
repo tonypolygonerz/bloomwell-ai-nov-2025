@@ -1,193 +1,118 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  ShieldCheckIcon,
-  LockIcon,
-  CircleCheckIcon,
-  UptimeIcon,
-} from '@/components/ui/icons'
 
 export function MarketingFooter() {
   return (
-    <footer className="bg-brand-navy text-white py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
-          {/* Logo & Description */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-white"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M7.5 1.5L4 8H7V12.5L11 6H7.5V1.5Z" fill="white" />
-                </svg>
-              </div>
-              <span className="font-bold text-lg">Bloomwell AI</span>
-            </div>
-            <p className="text-gray-400 text-sm mb-4">
-              Empowering nonprofits with AI-driven grant discovery and management tools. Find
-              funding faster, save time and grow your impact.
-            </p>
-            <div className="mb-4">
-              <p className="text-sm font-semibold mb-2">Stay Updated</p>
-              <form
-                className="flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  // Newsletter subscription functionality can be added here
-                }}
-              >
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-3 py-2 rounded bg-white/10 border border-white/20 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:border-brand"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded font-medium text-sm transition-colors hover:opacity-90"
-                  style={{ backgroundColor: '#00A63D' }}
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
+    <footer className="bg-brand-navy text-white">
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="mb-8">
+          <h3 className="mb-4 text-lg font-semibold">Bloomwell AI</h3>
+          <p className="text-gray-300">
+            Empowering nonprofits with AI-driven grant discovery and management tools. Find funding
+            faster, save time and grow your impact.
+          </p>
+        </div>
 
-          {/* Product */}
+        <div className="mb-8">
+          <h4 className="mb-2 text-sm font-semibold">Stay Updated</h4>
+          <form
+            className="flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault()
+              // Newsletter subscription functionality can be added here
+            }}
+          >
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 rounded-md border border-gray-600 bg-brand-navy px-3 py-2 text-white placeholder-gray-400 focus:border-brand focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="rounded-md bg-brand px-4 py-2 font-medium text-white hover:bg-brand-hover"
+            >
+              Subscribe
+            </button>
+          </form>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h4 className="mb-4 text-sm font-semibold">Product</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="#features" className="hover:text-white transition-colors">
+                <Link href="#features" className="hover:text-white">
                   Features
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-white transition-colors">
+                <Link href="/pricing" className="hover:text-white">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/app" className="hover:text-white transition-colors">
+                <Link href="/app" className="hover:text-white">
                   Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="/app" className="hover:text-white transition-colors">
-                  Assistant
                 </Link>
               </li>
             </ul>
           </div>
-
-          {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h4 className="mb-4 text-sm font-semibold">Company</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
+                <Link href="/about" className="hover:text-white">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#testimonials" className="hover:text-white transition-colors">
+                <Link href="#testimonials" className="hover:text-white">
                   Testimonials
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">
+                <Link href="/privacy" className="hover:text-white">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-white transition-colors">
+                <Link href="/terms" className="hover:text-white">
                   Terms of Service
                 </Link>
               </li>
             </ul>
           </div>
-
-          {/* Support */}
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h4 className="mb-4 text-sm font-semibold">Support</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/help" className="hover:text-white transition-colors">
+                <Link href="/help" className="hover:text-white">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
+                <Link href="/contact" className="hover:text-white">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link href="/webinars" className="hover:text-white transition-colors">
+                <Link href="/webinars" className="hover:text-white">
                   Webinars
-                </Link>
-              </li>
-              <li>
-                <Link href="/help" className="hover:text-white transition-colors">
-                  FAQs
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Trust Features */}
-        <div className="mb-8 pt-8 border-t border-white/10">
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-center items-center">
-            <div className="flex items-center gap-3">
-              <ShieldCheckIcon className="w-6 h-6 text-brand flex-shrink-0" />
-              <span className="text-sm text-gray-400">SOC 2 Compliant</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <LockIcon className="w-6 h-6 text-brand flex-shrink-0" />
-              <span className="text-sm text-gray-400">256-bit SSL</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <CircleCheckIcon className="w-6 h-6 text-brand flex-shrink-0" />
-              <span className="text-sm text-gray-400">GDPR Ready</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <UptimeIcon className="w-6 h-6 text-brand flex-shrink-0" />
-              <span className="text-sm text-gray-400">99.9% Uptime</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-8 border-t border-gray-700 pt-8">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-gray-400">© 2025 Bloomwell AI. All rights reserved.</p>
-
-            {/* Social Icons */}
-            <div className="flex gap-4">
-              {['Twitter', 'LinkedIn', 'YouTube', 'Instagram'].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-                  aria-label={social}
-                >
-                  <span className="sr-only">{social}</span>
-                  {/* Placeholder for social icons - replace with actual icons */}
-                  <div className="w-4 h-4 bg-white/50 rounded-full" />
-                </a>
-              ))}
-            </div>
-
-            {/* Bottom Stats */}
-            <div className="flex gap-6 text-xs text-gray-400">
-              <span>AI-Powered</span>
-              <span>73K+ Grants</span>
-              <span>24/7 Support</span>
-              <span>98% Success</span>
+            <div className="flex items-center space-x-4">
+              <span className="text-xs text-gray-500">SOC 2 Compliant</span>
+              <span className="text-xs text-gray-500">256-bit SSL</span>
+              <span className="text-xs text-gray-500">GDPR Ready</span>
+              <span className="text-xs text-gray-500">99.9% Uptime</span>
             </div>
           </div>
         </div>

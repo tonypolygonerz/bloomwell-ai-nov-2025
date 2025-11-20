@@ -23,6 +23,7 @@
     "db:push": "turbo run db:push",
     "db:migrate": "turbo run db:migrate",
     "db:reset": "turbo run db:reset",
+    "seed:webinars": "tsx tooling/scripts/seedWebinars.ts",
     "quality": "turbo run type-check lint format:check test",
     "prepare": "husky install"
   },

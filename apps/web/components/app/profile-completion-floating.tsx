@@ -36,6 +36,11 @@ export function ProfileCompletionFloating() {
     const fetchCompletionStatus = async () => {
       try {
         const response = await fetch('/api/onboarding/status')
+        if (!response.ok) {
+          console.error('Failed to fetch completion status:', response.status, response.statusText)
+          setIsLoading(false)
+          return
+        }
         const data = await response.json()
         setCompletionData({
           completionPercentage: data.completionPercentage || 0,

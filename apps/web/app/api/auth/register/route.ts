@@ -96,8 +96,8 @@ export async function POST(request: NextRequest) {
     const isAdmin = email === 'teleportdoor@gmail.com'
 
     console.log('[Registration] Creating user with email:', email)
-    
-    await prisma.user.create({
+
+    const user = await prisma.user.create({
       data: {
         name,
         email,
@@ -109,7 +109,17 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    console.log('[Registration] User created successfully')
+    console.log('[Registration] User created successfully, creating organization...')
+
+    // Create empty organization for new user
+    await prisma.organization.create({
+      data: {
+        userId: user.id,
+        name: name, // Use user's name as default organization name
+      },
+    })
+
+    console.log('[Registration] Organization created successfully')
     return NextResponse.json({ success: true }, { status: 201 })
   } catch (error) {
     // Enhanced error logging with Prisma-specific error detection

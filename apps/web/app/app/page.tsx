@@ -62,9 +62,9 @@ export default function DashboardPage() {
   return (
     <div className="flex h-full flex-col">
       <ProfileCompletionFloating />
-      <main className="flex-1 px-0 sm:px-6 lg:px-8 flex flex-col pt-20">
+      <main className="flex-1 px-0 sm:px-6 lg:px-8 flex flex-col pt-16">
         {/* Greeting - Always visible */}
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <h1 className="text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white">
             Good to see you, {userName}.
           </h1>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
         {/* Chat Messages - Scrollable */}
         <div className="flex-1 overflow-y-auto space-y-6 pb-4">
           {messages.length === 0 ? (
-            <div className="text-slate-500 dark:text-slate-400">
+            <div className="text-center text-slate-500 dark:text-slate-400">
               Start a conversation to get started.
             </div>
           ) : (
@@ -107,7 +107,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions - Show when no messages */}
         {messages.length === 0 && (
-          <div className="mb-8 grid gap-4 md:grid-cols-2">
+          <div className="mb-8 grid gap-4 md:grid-cols-2 max-w-2xl mx-auto">
             {quickActions.map((action, idx) => (
               <button
                 key={idx}
@@ -120,7 +120,7 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
-      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+      <div className="sticky bottom-0 border-t border-slate-200/50 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm p-4">
         <div className="mx-auto max-w-3xl w-full">
           <div className="mb-2 flex items-center gap-2">
             <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -134,18 +134,20 @@ export default function DashboardPage() {
             </label>
           </div>
           <div className="flex items-center gap-4">
-            <Input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSubmit()
-                }
-              }}
-              placeholder="Ask me anything..."
-              className="flex-1"
-            />
+            <div className="flex-1 relative">
+              <Input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSubmit()
+                  }
+                }}
+                placeholder="Ask me anything..."
+                className="w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-slate-200/50 dark:border-slate-700/50 shadow-lg"
+              />
+            </div>
             <button
               onClick={() => handleSubmit()}
               disabled={isLoading || !message.trim()}

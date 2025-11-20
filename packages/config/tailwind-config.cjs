@@ -5,6 +5,7 @@ module.exports = {
   content: [
     '../../apps/web/app/**/*.{ts,tsx}',
     '../../apps/web/components/**/*.{ts,tsx}',
+    '../../apps/web/src/**/*.{ts,tsx}',
     '../../apps/admin/app/**/*.{ts,tsx}',
     '../../apps/admin/components/**/*.{ts,tsx}',
     '../../packages/ui/**/*.{ts,tsx}',

@@ -224,27 +224,9 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={`${
-        isCollapsed ? 'w-[60px]' : 'w-[280px]'
+        isCollapsed ? 'w-[70px]' : 'w-[280px]'
       } relative flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all duration-300 ease-in-out overflow-hidden`}
     >
-      {/* Toggle Button - D-shaped with blue border */}
-      <button
-        onClick={onToggle}
-        className="absolute -right-3 top-6 z-50 w-8 h-8 rounded-lg border-2 border-blue-500 dark:border-blue-400 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md hover:border-blue-600 dark:hover:border-blue-300 transition-all duration-200 flex items-center justify-center"
-        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      >
-        <svg
-          className={`w-4 h-4 text-slate-600 dark:text-slate-300 transition-transform duration-200 ${
-            isCollapsed ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
       <nav className="flex-1 space-y-2 px-4 overflow-y-auto">
         {/* TODO: Create /app/chat/new page */}
         {/* <Link
@@ -256,10 +238,10 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
           </Link> */}
 
         {/* + New Chat Button */}
-        <div className="px-4 mt-4 mb-4 -ml-[17px]">
+        <div className={`px-4 ${isCollapsed ? '-ml-[5px] flex items-center justify-center h-16' : '-ml-[17px] mt-4 mb-4'}`}>
           <button
             onClick={handleCreateChat}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-center gap-2'} px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-medium transition-all duration-200 shadow-sm hover:shadow-md`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-center gap-2'} px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md`}
             aria-label="New Chat"
           >
             <svg
@@ -575,10 +557,11 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         )}
 
         {/* Webinars Link */}
-        <Link
-          href="/webinars"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors duration-150"
-        >
+        <div className={isCollapsed ? 'flex items-center justify-center h-16' : ''}>
+          <Link
+            href="/app/webinars"
+            className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors duration-150`}
+          >
           <svg
             className="w-5 h-5 flex-shrink-0 text-slate-600 dark:text-slate-400"
             fill="none"
@@ -597,7 +580,8 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
           >
             Webinars
           </span>
-        </Link>
+          </Link>
+        </div>
       </nav>
 
       {/* Trial Banner */}
@@ -636,8 +620,29 @@ export function AppSidebar({ isCollapsed, onToggle }: SidebarProps) {
         </div>
       )}
 
-      <div className="border-t border-slate-200 dark:border-slate-700 p-4">
-        <div className="flex items-center gap-3">
+      {/* Minimized Trial Banner */}
+      {isTrialActive && daysRemaining > 0 && isCollapsed && (
+        <div className="flex flex-col items-center justify-center h-16 gap-1">
+          <button
+            onClick={() => setShowTrialPopover(true)}
+            className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-700 flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
+            title={`Trial: Day ${currentDay} of ${totalTrialDays}`}
+          >
+            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+          <div className="w-10 h-1 rounded-full bg-purple-200 dark:bg-purple-800 overflow-hidden">
+            <div
+              className="h-full bg-purple-600 dark:bg-purple-500 transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className={`border-t border-slate-200 dark:border-slate-700 ${isCollapsed ? 'flex items-center justify-center h-16 p-0' : 'p-4'}`}>
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">
             {session?.user?.name?.charAt(0) ?? 'U'}
           </div>

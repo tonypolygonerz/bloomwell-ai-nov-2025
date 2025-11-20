@@ -4,7 +4,12 @@ import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
-export function AppTopbar() {
+interface TopbarProps {
+  isCollapsed: boolean
+  onToggle: () => void
+}
+
+export function AppTopbar({ isCollapsed, onToggle }: TopbarProps) {
   const { data: session } = useSession()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [isDark, setIsDark] = useState(false)
@@ -39,10 +44,28 @@ export function AppTopbar() {
 
   return (
     <header className="sticky top-0 z-50 h-16 flex items-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/50 dark:border-slate-700/50">
-      <div className="mx-auto flex max-w-full items-center justify-between px-4 sm:px-6 w-full">
-        <Link href="/app" className="text-lg font-bold text-slate-900 dark:text-white">
-          Bloomwell AI
-        </Link>
+      <div className="mx-auto flex max-w-full items-center justify-between w-full pl-[9px] pr-4 sm:pl-[17px] sm:pr-6">
+        <div className="flex items-center gap-3">
+          {/* Collapse Button */}
+          <button
+            onClick={onToggle}
+            className="w-8 h-8 rounded-full border border-emerald-200 dark:border-emerald-800 bg-slate-100 dark:bg-slate-800 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center"
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg
+              className="w-4 h-4 text-slate-600 dark:text-slate-300 transition-all duration-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
+          <Link href="/app" className="text-lg font-bold text-slate-900 dark:text-white">
+            Bloomwell AI
+          </Link>
+        </div>
         <div className="flex items-center gap-1 sm:gap-3">
           {/* Notifications Button with Badge */}
           <button className="relative h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200 flex items-center justify-center">
