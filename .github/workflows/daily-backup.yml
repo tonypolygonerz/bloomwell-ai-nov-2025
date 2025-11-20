@@ -12,6 +12,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Git user
         run: |
@@ -21,8 +23,8 @@ jobs:
       - name: Create backup branch
         run: |
           BRANCH="backup/$(date +%Y-%m-%d)"
-          git checkout -b "$BRANCH"
-          git push origin "$BRANCH"
+          git checkout -b "$BRANCH" || git checkout "$BRANCH"
+          git push origin "$BRANCH" || true
 
       - name: Database backup (schema validate)
         run: |
@@ -30,3 +32,22 @@ jobs:
           npx prisma validate --schema=packages/db/prisma/schema.prisma
         env:
           DATABASE_URL: 'postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public'
+
+      - name: Create backup archive
+        run: |
+          mkdir -p backup-archive
+          tar -czf backup-archive/codebase-$(date +%Y%m%d).tar.gz \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='.turbo' \
+            --exclude='dist' \
+            --exclude='build' \
+            --exclude='.git' \
+            .
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codebase-backup-$(date +%Y%m%d)
+          path: backup-archive/
+          retention-days: 30
