@@ -155,22 +155,18 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Redirect to Step 2 if basic completion is missing (user hasn't selected organization type)
-        if (!data.isBasicComplete && typeof window !== 'undefined') {
-          const redirected = await handleOnboardingRedirect(retryCount, delays, checkOnboarding)
-          if (redirected) {
-            return
-          }
-        } else {
-          // Reset redirect attempts on successful check
-          redirectAttemptsRef.current = 0
-          clearRedirectFlags()
+        // Allow access to /app even with incomplete profiles
+        // Profile completion widget will handle prompting users to complete onboarding
+        // No auto-redirect - users can access /app freely
+        
+        // Reset redirect attempts
+        redirectAttemptsRef.current = 0
+        clearRedirectFlags()
 
-          // Clean up query parameter if present
-          if (skipOnboarding) {
-            const newUrl = window.location.pathname
-            router.replace(newUrl as any, { scroll: false })
-          }
+        // Clean up query parameter if present
+        if (skipOnboarding) {
+          const newUrl = window.location.pathname
+          router.replace(newUrl as any, { scroll: false })
         }
       } catch (error) {
         console.error('Failed to check onboarding status:', error)

@@ -14,6 +14,60 @@ const organizationTypes = [
   'Other (Individual Researcher, For-Profit, etc.)',
 ]
 
+const usStatesAbbreviations = [
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' },
+  { value: 'DC', label: 'District of Columbia' },
+]
+
 interface ProPublicaResult {
   name: string
   ein: string
@@ -43,6 +97,12 @@ export default function Step2Page() {
     legalName?: string
     ein?: string
   } | null>(null)
+  
+  // Step 2 additional fields
+  const [yearsOperating, setYearsOperating] = useState('')
+  const [stateOfIncorporation, setStateOfIncorporation] = useState('')
+  const [currentLegalStatus, setCurrentLegalStatus] = useState('')
+  const [taxExemptStatusDate, setTaxExemptStatusDate] = useState('')
 
   // Manual entry search state (for non-nonprofit types)
   const [manualSearchQuery, setManualSearchQuery] = useState('')
@@ -274,6 +334,10 @@ export default function Step2Page() {
           ein: orgData?.ein || ein || undefined,
           legalName: orgData?.legalName || organizationName || undefined,
           isVerified: isVerified || !!orgData,
+          yearsOperating: yearsOperating || undefined,
+          stateOfIncorporation: stateOfIncorporation || undefined,
+          currentLegalStatus: currentLegalStatus || undefined,
+          taxExemptStatusDate: taxExemptStatusDate || undefined,
           email: session?.user?.email || undefined, // Include email for authentication
         }),
       })
@@ -318,6 +382,10 @@ export default function Step2Page() {
             ein: orgData?.ein || ein || undefined,
             legalName: orgData?.legalName || organizationName || undefined,
             isVerified: isVerified || !!orgData,
+            yearsOperating: yearsOperating || undefined,
+            stateOfIncorporation: stateOfIncorporation || undefined,
+            currentLegalStatus: currentLegalStatus || undefined,
+            taxExemptStatusDate: taxExemptStatusDate || undefined,
             email: session?.user?.email || undefined, // Include email for authentication
           }),
         }),
@@ -395,9 +463,11 @@ export default function Step2Page() {
   // Determine if Continue button should be disabled
   // For nonprofit: button is enabled if user has typed in organization name OR EIN field
   // For non-nonprofit: button is enabled if organization type is selected
+  // All types require: yearsOperating, stateOfIncorporation, currentLegalStatus
   const hasOrganizationInput =
     Boolean(searchQuery?.trim()) || Boolean(organizationName?.trim()) || Boolean(ein?.trim())
-  const isContinueDisabled = !selectedType || (isNonprofit && !hasOrganizationInput)
+  const hasRequiredFields = Boolean(yearsOperating) && Boolean(stateOfIncorporation) && Boolean(currentLegalStatus)
+  const isContinueDisabled = !selectedType || !hasRequiredFields || (isNonprofit && !hasOrganizationInput)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-8">
@@ -408,10 +478,10 @@ export default function Step2Page() {
           <p className="text-gray-600">Let's set up your organization profile</p>
         </div>
 
-        <ProgressIndicator currentStep={2} totalSteps={3} />
+        <ProgressIndicator currentStep={2} totalSteps={4} />
 
         <div className="mb-6">
-          <h2 className="mb-4 text-xl font-semibold">Step 1: Who You Are</h2>
+          <h2 className="mb-4 text-xl font-semibold">Step 2: Organization Identity</h2>
 
           {/* Primary: Organization Search (for nonprofits) */}
           {isNonprofit && (
@@ -539,6 +609,83 @@ export default function Step2Page() {
                   {type}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Additional Organization Details */}
+          <div className="mb-6 space-y-4">
+            <h3 className="mb-3 text-sm font-medium text-gray-700">Additional Organization Details</h3>
+            
+            {/* Years Operating */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Years Operating <span className="text-red-600">*</span>
+              </label>
+              <select
+                value={yearsOperating}
+                onChange={(e) => setYearsOperating(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+                required
+              >
+                <option value="">Select years operating</option>
+                <option value="<1">Less than 1 year</option>
+                <option value="1-3">1-3 years</option>
+                <option value="4-10">4-10 years</option>
+                <option value="11-25">11-25 years</option>
+                <option value="25+">25+ years</option>
+              </select>
+            </div>
+
+            {/* State of Incorporation */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                State of Incorporation <span className="text-red-600">*</span>
+              </label>
+              <select
+                value={stateOfIncorporation}
+                onChange={(e) => setStateOfIncorporation(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+                required
+              >
+                <option value="">Select state</option>
+                {usStatesAbbreviations.map((state) => (
+                  <option key={state.value} value={state.value}>
+                    {state.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Current Legal Status */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Current Legal Status <span className="text-red-600">*</span>
+              </label>
+              <select
+                value={currentLegalStatus}
+                onChange={(e) => setCurrentLegalStatus(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+                required
+              >
+                <option value="">Select status</option>
+                <option value="Active">Active</option>
+                <option value="Pending">Pending</option>
+                <option value="Suspended">Suspended</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Tax Exempt Status Date (Optional) */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                501(c)(3) Status Date <span className="text-xs font-normal text-gray-500">(Optional)</span>
+              </label>
+              <input
+                type="date"
+                value={taxExemptStatusDate}
+                onChange={(e) => setTaxExemptStatusDate(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[#1E6F5C] hover:border-[#1E6F5C]"
+              />
             </div>
           </div>
 
