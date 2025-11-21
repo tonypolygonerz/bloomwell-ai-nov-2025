@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@bloomwell/auth'
 import prisma from '@bloomwell/db'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { hash } from 'bcryptjs'
 
@@ -12,7 +13,7 @@ const OrganizationSchema = z.object({
   mission: z.string().optional(),
   budget: z.string().optional(),
   staffSize: z.string().optional(),
-  focusAreas: z.string().optional(),
+  focusAreas: z.union([z.string(), z.array(z.string())]).optional(), // Can be string or array
   revenueBracket: z.string().optional(),
   recentGrantActivity: z.string().optional(),
   serviceGeo: z.string().optional(),
@@ -21,6 +22,30 @@ const OrganizationSchema = z.object({
   isVerified: z.boolean().optional(),
   password: z.string().min(8).optional(),
   email: z.string().email().optional(), // For onboarding users without password
+  
+  // Step 2 additional fields
+  yearsOperating: z.string().optional(),
+  stateOfIncorporation: z.string().optional(),
+  currentLegalStatus: z.string().optional(),
+  taxExemptStatusDate: z.string().optional(),
+  
+  // Step 3 additional fields
+  missionStatement: z.string().optional(),
+  programDescriptions: z.union([z.string(), z.array(z.any())]).optional(), // Can be string or array
+  geographicServiceArea: z.string().optional(),
+  annualBudget: z.string().optional(),
+  revenueSourcesGov: z.number().int().min(0).max(100).optional(),
+  revenueSourcesPrivate: z.number().int().min(0).max(100).optional(),
+  revenueSourcesDonations: z.number().int().min(0).max(100).optional(),
+  revenueSourcesOther: z.number().int().min(0).max(100).optional(),
+  boardSize: z.number().int().min(0).optional(),
+  volunteerCount: z.string().optional(),
+  previousGrantExperience: z.string().optional(),
+  fundingGoals: z.union([z.string(), z.array(z.string())]).optional(), // Can be string or array
+  
+  // Step 4 fields
+  documents: z.any().optional(), // JSON field for documents
+  boardRoster: z.any().optional(), // JSON field for board roster
 })
 
 export async function POST(request: NextRequest) {
@@ -88,10 +113,42 @@ export async function POST(request: NextRequest) {
   }
 
   // Extract state and map to serviceGeo
-  const { state, ...otherData } = data
+  const { state, focusAreas, fundingGoals, programDescriptions, ...otherData } = data
   const parsedData = {
     ...otherData,
     serviceGeo: state || data.serviceGeo, // Use state if provided
+    // Convert focusAreas to JSON if it's an array or string
+    focusAreas: focusAreas
+      ? Array.isArray(focusAreas)
+        ? focusAreas
+        : typeof focusAreas === 'string'
+        ? focusAreas.split(',').map((s) => s.trim()).filter(Boolean)
+        : focusAreas
+      : undefined,
+    // Convert fundingGoals to JSON if it's an array or string
+    fundingGoals: fundingGoals
+      ? Array.isArray(fundingGoals)
+        ? fundingGoals
+        : typeof fundingGoals === 'string'
+        ? fundingGoals.split(',').map((s) => s.trim()).filter(Boolean)
+        : fundingGoals
+      : undefined,
+    // Convert programDescriptions to JSON if it's an array or string
+    programDescriptions: programDescriptions
+      ? Array.isArray(programDescriptions)
+        ? programDescriptions
+        : typeof programDescriptions === 'string'
+        ? (() => {
+            try {
+              // Try to parse as JSON first (in case it's a JSON string)
+              return JSON.parse(programDescriptions)
+            } catch {
+              // If not valid JSON, return as string (backward compatibility)
+              return programDescriptions
+            }
+          })()
+        : programDescriptions
+      : undefined,
   }
 
   if (session) {
@@ -188,13 +245,70 @@ export async function POST(request: NextRequest) {
         ...(parsedData.mission !== undefined && { mission: parsedData.mission ?? null }),
         ...(parsedData.budget !== undefined && { budget: parsedData.budget ?? null }),
         ...(parsedData.staffSize !== undefined && { staffSize: parsedData.staffSize ?? null }),
-        ...(parsedData.focusAreas !== undefined && { focusAreas: parsedData.focusAreas ?? null }),
+        ...(parsedData.focusAreas !== undefined && { focusAreas: parsedData.focusAreas ? (Array.isArray(parsedData.focusAreas) ? parsedData.focusAreas : [parsedData.focusAreas]) : Prisma.JsonNull }),
         ...(parsedData.revenueBracket !== undefined && {
           revenueBracket: parsedData.revenueBracket ?? null,
         }),
         ...(parsedData.serviceGeo !== undefined && { serviceGeo: parsedData.serviceGeo ?? null }),
         ...(parsedData.fiscalYear !== undefined && { fiscalYear: parsedData.fiscalYear ?? null }),
         ...(parsedData.isVerified !== undefined && { isVerified: parsedData.isVerified }),
+        // Step 2 fields
+        ...(parsedData.yearsOperating !== undefined && {
+          yearsOperating: parsedData.yearsOperating ?? null,
+        }),
+        ...(parsedData.stateOfIncorporation !== undefined && {
+          stateOfIncorporation: parsedData.stateOfIncorporation ?? null,
+        }),
+        ...(parsedData.currentLegalStatus !== undefined && {
+          currentLegalStatus: parsedData.currentLegalStatus ?? null,
+        }),
+        ...(parsedData.taxExemptStatusDate !== undefined && {
+          taxExemptStatusDate: parsedData.taxExemptStatusDate ?? null,
+        }),
+        // Step 3 fields
+        ...(parsedData.missionStatement !== undefined && {
+          missionStatement: parsedData.missionStatement ?? null,
+        }),
+        ...(parsedData.programDescriptions !== undefined && {
+          programDescriptions: parsedData.programDescriptions ?? null,
+        }),
+        ...(parsedData.geographicServiceArea !== undefined && {
+          geographicServiceArea: parsedData.geographicServiceArea ?? null,
+        }),
+        ...(parsedData.annualBudget !== undefined && {
+          annualBudget: parsedData.annualBudget ?? null,
+        }),
+        ...(parsedData.revenueSourcesGov !== undefined && {
+          revenueSourcesGov: parsedData.revenueSourcesGov ?? null,
+        }),
+        ...(parsedData.revenueSourcesPrivate !== undefined && {
+          revenueSourcesPrivate: parsedData.revenueSourcesPrivate ?? null,
+        }),
+        ...(parsedData.revenueSourcesDonations !== undefined && {
+          revenueSourcesDonations: parsedData.revenueSourcesDonations ?? null,
+        }),
+        ...(parsedData.revenueSourcesOther !== undefined && {
+          revenueSourcesOther: parsedData.revenueSourcesOther ?? null,
+        }),
+        ...(parsedData.boardSize !== undefined && {
+          boardSize: parsedData.boardSize ?? null,
+        }),
+        ...(parsedData.volunteerCount !== undefined && {
+          volunteerCount: parsedData.volunteerCount ?? null,
+        }),
+        ...(parsedData.previousGrantExperience !== undefined && {
+          previousGrantExperience: parsedData.previousGrantExperience ?? null,
+        }),
+        ...(parsedData.fundingGoals !== undefined && {
+          fundingGoals: parsedData.fundingGoals ? (Array.isArray(parsedData.fundingGoals) ? parsedData.fundingGoals : [parsedData.fundingGoals]) : Prisma.JsonNull,
+        }),
+        // Step 4 fields
+        ...(parsedData.documents !== undefined && {
+          documents: parsedData.documents ?? null,
+        }),
+        ...(parsedData.boardRoster !== undefined && {
+          boardRoster: parsedData.boardRoster ?? null,
+        }),
       },
       create: {
         userId,
@@ -204,11 +318,32 @@ export async function POST(request: NextRequest) {
         mission: parsedData.mission ?? null,
         budget: parsedData.budget ?? null,
         staffSize: parsedData.staffSize ?? null,
-        focusAreas: parsedData.focusAreas ?? null,
+        focusAreas: parsedData.focusAreas ? (Array.isArray(parsedData.focusAreas) ? parsedData.focusAreas : [parsedData.focusAreas]) : Prisma.JsonNull,
         revenueBracket: parsedData.revenueBracket ?? null,
         serviceGeo: parsedData.serviceGeo ?? null,
         fiscalYear: parsedData.fiscalYear ?? null,
         isVerified: parsedData.isVerified ?? false,
+        // Step 2 fields
+        yearsOperating: parsedData.yearsOperating ?? null,
+        stateOfIncorporation: parsedData.stateOfIncorporation ?? null,
+        currentLegalStatus: parsedData.currentLegalStatus ?? null,
+        taxExemptStatusDate: parsedData.taxExemptStatusDate ?? null,
+        // Step 3 fields
+        missionStatement: parsedData.missionStatement ?? null,
+        programDescriptions: parsedData.programDescriptions ?? null,
+        geographicServiceArea: parsedData.geographicServiceArea ?? null,
+        annualBudget: parsedData.annualBudget ?? null,
+        revenueSourcesGov: parsedData.revenueSourcesGov ?? null,
+        revenueSourcesPrivate: parsedData.revenueSourcesPrivate ?? null,
+        revenueSourcesDonations: parsedData.revenueSourcesDonations ?? null,
+        revenueSourcesOther: parsedData.revenueSourcesOther ?? null,
+        boardSize: parsedData.boardSize ?? null,
+        volunteerCount: parsedData.volunteerCount ?? null,
+        previousGrantExperience: parsedData.previousGrantExperience ?? null,
+        fundingGoals: parsedData.fundingGoals ? (Array.isArray(parsedData.fundingGoals) ? parsedData.fundingGoals : [parsedData.fundingGoals]) : Prisma.JsonNull,
+        // Step 4 fields
+        documents: parsedData.documents ?? null,
+        boardRoster: parsedData.boardRoster ?? null,
       },
     })
 
