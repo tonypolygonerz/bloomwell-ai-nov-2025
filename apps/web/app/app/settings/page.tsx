@@ -6,21 +6,40 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Input } from '@bloomwell/ui'
 
-type Tab = 'profile' | 'account' | 'notifications' | 'billing'
+type Tab = 'profile' | 'account' | 'organization' | 'notifications' | 'billing'
 
 interface Organization {
   id: string
+  name?: string | null
   legalName?: string | null
   organizationType?: string | null
   ein?: string | null
   mission?: string | null
+  missionStatement?: string | null
   budget?: string | null
+  annualBudget?: string | null
   staffSize?: string | null
-  focusAreas?: string | null
+  focusAreas?: string | string[] | null
   revenueBracket?: string | null
   serviceGeo?: string | null
+  geographicServiceArea?: string | null
   fiscalYear?: string | null
   isVerified?: boolean
+  yearsOperating?: string | null
+  stateOfIncorporation?: string | null
+  currentLegalStatus?: string | null
+  taxExemptStatusDate?: string | null
+  programDescriptions?: string | null
+  revenueSourcesGov?: number | null
+  revenueSourcesPrivate?: number | null
+  revenueSourcesDonations?: number | null
+  revenueSourcesOther?: number | null
+  boardSize?: number | null
+  volunteerCount?: string | null
+  previousGrantExperience?: string | null
+  fundingGoals?: string | string[] | null
+  documents?: any
+  boardRoster?: any
 }
 
 interface SubscriptionStatus {
@@ -95,6 +114,7 @@ function SettingsContent() {
   const tabs: { id: Tab; label: string; href: string }[] = [
     { id: 'profile', label: 'Profile', href: '/app/settings?tab=profile' },
     { id: 'account', label: 'Account', href: '/app/settings?tab=account' },
+    { id: 'organization', label: 'Organization Profile', href: '/app/settings?tab=organization' },
     { id: 'notifications', label: 'Notifications', href: '/app/settings?tab=notifications' },
     { id: 'billing', label: 'Billing', href: '/app/settings?tab=billing' },
   ]
@@ -114,7 +134,7 @@ function SettingsContent() {
           {tabs.map((tab) => (
             <Link
               key={tab.id}
-              href={tab.href}
+              href={tab.href as any}
               className={`
                 whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors
                 ${
@@ -142,6 +162,9 @@ function SettingsContent() {
               <ProfileTab session={session} organization={organization} />
             )}
             {activeTab === 'account' && <AccountTab session={session} />}
+            {activeTab === 'organization' && (
+              <OrganizationTab session={session} organization={organization} />
+            )}
             {activeTab === 'notifications' && <NotificationsTab session={session} />}
             {activeTab === 'billing' && (
               <BillingTab
@@ -693,6 +716,268 @@ function BillingTab({
         <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
           Usage statistics reset daily and monthly
         </p>
+      </div>
+    </div>
+  )
+}
+
+// Organization Tab Component
+function OrganizationTab({
+  session,
+  organization,
+}: {
+  session: any
+  organization: Organization | null
+}) {
+  const [completionStatus, setCompletionStatus] = useState<{
+    completionPercentage: number
+    isBasicComplete: boolean
+  } | null>(null)
+
+  useEffect(() => {
+    fetch('/api/onboarding/status')
+      .then((res) => res.json())
+      .then((data) => {
+        setCompletionStatus({
+          completionPercentage: data.completionPercentage || 0,
+          isBasicComplete: data.isBasicComplete || false,
+        })
+      })
+      .catch((error) => {
+        console.error('Error fetching completion status:', error)
+      })
+  }, [])
+
+  const getNextStep = () => {
+    if (!organization?.organizationType) return '/onboarding/step2'
+    if (!organization?.missionStatement) return '/onboarding/step3'
+    if (!organization?.documents) return '/onboarding/step4'
+    return '/onboarding/step4'
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Organization Profile</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          Manage your organization information and profile completion
+        </p>
+      </div>
+
+      {/* Profile Completion Status */}
+      {completionStatus && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium text-blue-900 dark:text-blue-100">
+                Profile Completion
+              </h3>
+              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                Complete your profile for better AI recommendations
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                {completionStatus.completionPercentage}%
+              </div>
+              <Link
+                href={getNextStep()}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+              >
+                Continue Onboarding →
+              </Link>
+            </div>
+          </div>
+          <div className="w-full bg-blue-200 rounded-full h-2 mt-4 dark:bg-blue-800">
+            <div
+              className="bg-blue-600 h-2 rounded-full dark:bg-blue-500"
+              style={{ width: `${completionStatus.completionPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
+
+      {/* Basic Information */}
+      <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Basic Information</h3>
+          <Link
+            href="/onboarding/step2"
+            className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium"
+          >
+            Edit →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Organization Name:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.legalName || organization?.name || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">EIN:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.ein || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Organization Type:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.organizationType || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Years Operating:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.yearsOperating || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">State of Incorporation:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.stateOfIncorporation || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Legal Status:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.currentLegalStatus || 'Not set'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mission & Programs */}
+      <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Mission & Programs</h3>
+          <Link
+            href="/onboarding/step3"
+            className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium"
+          >
+            Edit →
+          </Link>
+        </div>
+        <div className="space-y-3 text-sm">
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Mission Statement:</span>
+            <p className="font-medium text-slate-900 dark:text-white mt-1">
+              {organization?.missionStatement || organization?.mission || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Focus Areas:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.focusAreas
+                ? Array.isArray(organization.focusAreas)
+                  ? organization.focusAreas.join(', ')
+                  : String(organization.focusAreas)
+                : 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Service Area:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.geographicServiceArea || organization?.serviceGeo || 'Not set'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Financial Profile */}
+      <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Financial Profile</h3>
+          <Link
+            href="/onboarding/step3"
+            className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium"
+          >
+            Edit →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Annual Budget:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.annualBudget || organization?.budget || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Staff Size:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.staffSize || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Fiscal Year:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.fiscalYear || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400">Grant Experience:</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {organization?.previousGrantExperience || 'Not set'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Documents */}
+      <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Documents</h3>
+          <Link
+            href="/onboarding/step4"
+            className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium"
+          >
+            Manage →
+          </Link>
+        </div>
+        <div className="space-y-2 text-sm">
+          {organization?.documents ? (
+            <>
+              {(organization.documents as any)?.determination501c3 ? (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-green-500 mr-2">✅</span>
+                  <span className="text-slate-900 dark:text-white">501(c)(3) Determination Letter</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-slate-300 mr-2">⭕</span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    501(c)(3) Determination Letter
+                  </span>
+                </div>
+              )}
+              {(organization.documents as any)?.articlesIncorporation ? (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-green-500 mr-2">✅</span>
+                  <span className="text-slate-900 dark:text-white">Articles of Incorporation</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-slate-300 mr-2">⭕</span>
+                  <span className="text-slate-500 dark:text-slate-400">Articles of Incorporation</span>
+                </div>
+              )}
+              {(organization.documents as any)?.bylaws ? (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-green-500 mr-2">✅</span>
+                  <span className="text-slate-900 dark:text-white">Organization Bylaws</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="w-4 h-4 text-slate-300 mr-2">⭕</span>
+                  <span className="text-slate-500 dark:text-slate-400">Organization Bylaws</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-slate-500 dark:text-slate-400">No documents uploaded</p>
+          )}
+        </div>
       </div>
     </div>
   )

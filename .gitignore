@@ -150,5 +150,8 @@ vite.config.ts.timestamp-*
 # Prisma
 prisma/*.db
 
+# Backup files
+*.backup
+
 # Ignore cursor AI rules
 .cursor/rules/codacy.mdc

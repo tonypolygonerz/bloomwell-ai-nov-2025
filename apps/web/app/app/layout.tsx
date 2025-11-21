@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { AppTopbar } from '@/components/app/topbar'
 import { AppSidebar } from '@/components/app/sidebar'
 import { OnboardingGate } from '@/components/app/onboarding-gate'
+import { ProfileCompletionFloating } from '@/components/app/profile-completion-floating'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
@@ -34,6 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
+      <ProfileCompletionFloating />
     </OnboardingGate>
   )
 }

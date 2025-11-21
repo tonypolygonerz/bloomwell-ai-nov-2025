@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Input } from '@bloomwell/ui'
-import { ProfileCompletionFloating } from '@/components/app/profile-completion-floating'
 
 export default function DashboardPage() {
   const { data: session } = useSession()
@@ -61,7 +60,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <ProfileCompletionFloating />
       <main className="flex-1 px-0 sm:px-6 lg:px-8 flex flex-col pt-16">
         {/* Greeting - Always visible */}
         <div className="mb-8 text-center">
