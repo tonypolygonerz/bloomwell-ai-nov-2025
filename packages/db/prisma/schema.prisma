@@ -54,17 +54,42 @@ model Organization {
   id             String  @id @default(cuid())
   user           User    @relation(fields: [userId], references: [id])
   userId         String  @unique
+  name           String?
   organizationType String?
   ein            String?
   legalName      String?
   mission        String?
   budget         String?
   staffSize      String?
-  focusAreas     String?
+  focusAreas     Json?
   revenueBracket String?
   serviceGeo     String?
   fiscalYear     String?
   isVerified     Boolean @default(false)
+  
+  // Step 2 additional fields
+  yearsOperating String?
+  stateOfIncorporation String?
+  currentLegalStatus String?
+  taxExemptStatusDate String?
+  
+  // Step 3 additional fields
+  missionStatement String?
+  programDescriptions Json?
+  geographicServiceArea String?
+  annualBudget String?
+  revenueSourcesGov Int?
+  revenueSourcesPrivate Int?
+  revenueSourcesDonations Int?
+  revenueSourcesOther Int?
+  boardSize Int?
+  volunteerCount String?
+  previousGrantExperience String?
+  fundingGoals Json?
+  
+  // Step 4 fields (documents and board roster - stored as JSON for now)
+  documents Json?
+  boardRoster Json?
 }
 
 model UserPreferences {
